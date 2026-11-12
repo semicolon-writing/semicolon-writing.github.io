@@ -872,6 +872,96 @@ button.prof:hover{background:var(--raise)}
 .fb-empty,.fb-note{margin:0;font-size:12.5px;color:var(--ink-3);line-height:1.5}
 .fb-empty{padding:16px 4px}
 @media (max-width:720px){.fb-list{max-height:none;overflow:visible}.fb-sample.big{font-size:22px}}
+/* Drafts */
+.dr-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;max-height:48vh;overflow:auto}
+.dr-list li{display:flex;align-items:center;gap:8px;padding:10px;border-radius:8px;flex-wrap:wrap}
+.dr-list li:hover{background:var(--raise)}
+.dr-list li.now{background:color-mix(in srgb,var(--accent) 9%,transparent)}
+.dr-list .when{flex:1;min-width:180px}
+.dr-list .when b{display:block;font-weight:600;font-size:14.5px}
+.dr-list .when small{color:var(--ink-3);font-size:12.5px;display:block}
+.dr-list .when em{font-style:normal;color:var(--ink-2);font-size:12.5px;display:block}
+.dr-list .btn{padding:6px 12px;font-size:13px}
+.dr-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.dr-top p{flex:1;min-width:200px;margin:0}
+.df-opts{display:flex;flex-direction:column;gap:6px}
+.df-opts label{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.df-opts label:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.df-opts input{margin-top:3px;accent-color:var(--accent)}
+.df-opts b{display:block;font-weight:600;font-size:14px}
+.df-opts small{color:var(--ink-3);font-size:12.5px}
+.df-opts i,.df-beside i,.f i{font-style:normal}
+.df-beside{display:flex;gap:8px;align-items:center;font-size:13.5px}
+.df-beside input{accent-color:var(--accent)}
+.modal.cmp{width:min(1240px,100%);height:calc(100% - 20px);gap:12px}
+.cmp-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:end}
+.cmp-bar label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--ink-3)}
+.cmp-bar select{font:inherit;font-size:13.5px;color:var(--ink);background:var(--raise);border:1px solid var(--line);border-radius:8px;padding:7px 10px;max-width:260px}
+.cmp-swap{padding:7px 10px}
+.cmp-view{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-left:auto}
+.cmp-view button{border:0;background:none;color:var(--ink-2);padding:7px 12px;font-size:13px}
+.cmp-view button[aria-pressed="true"]{background:var(--raise);color:var(--ink);font-weight:600}
+.cmp-bar .cmp-all{flex-direction:row;align-items:center;gap:6px;font-size:13px;color:var(--ink-2);padding-bottom:7px}
+.cmp-all input{accent-color:var(--accent)}
+.cmp-sum{font-size:13.5px;color:var(--ink-2)}
+.cmp-sum b.add{color:var(--good)}.cmp-sum b.del{color:var(--danger)}
+.cmp-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin;padding-bottom:2px;flex:none}.cmp-chips button{flex:none;white-space:nowrap}
+.cmp-chips:empty{display:none}
+.cmp-chips button{border:1px solid var(--line);background:none;color:var(--ink-2);border-radius:99px;padding:4px 11px;font-size:12.5px}
+.cmp-chips button:hover{background:var(--raise);color:var(--ink)}
+.cmp-chips button span{color:var(--ink-3)}
+.cmp-body{flex:1;min-height:0;overflow:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--page);color:var(--page-ink);font-family:var(--body-font);font-size:15.5px;line-height:1.6;padding:6px 0}
+.cmp-cols{display:grid;grid-template-columns:1fr 1fr;position:sticky;top:-6px;z-index:1;background:var(--page);border-bottom:1px solid var(--line);font:600 12px/1.4 var(--ui);color:var(--page-ink-3);text-transform:uppercase;letter-spacing:.06em;margin-top:-6px}
+.cmp-cols div{padding:8px 20px}
+.cmp-row{display:grid;grid-template-columns:1fr 1fr}
+.cmp-body.one .cmp-row,.cmp-body.one .cmp-cols{grid-template-columns:1fr}
+.cmp-body.one .cmp-cols div+div{display:none}
+.cmp-cell{padding:3px 20px;min-width:0;overflow-wrap:anywhere}
+.cmp-cell.b{border-left:1px solid var(--line)}
+.cmp-cell p{margin:.3em 0}
+.cmp-ch{font-family:var(--head-font);font-weight:500;font-size:1.25em;margin:.9em 0 .3em}
+.cmp-hr{text-align:center;color:var(--page-ink-3);letter-spacing:.3em;margin:.4em 0}
+.cmp-row.del .cmp-cell.a,.cmp-row.ins .cmp-cell.b{background:color-mix(in srgb,var(--rowc) 10%,transparent);box-shadow:inset 3px 0 0 var(--rowc)}
+.cmp-row.del{--rowc:var(--danger)}.cmp-row.ins{--rowc:var(--good)}
+.cmp-row.mod .cmp-cell{box-shadow:inset 3px 0 0 color-mix(in srgb,var(--page-accent) 55%,transparent)}
+.cmp-row.del .cmp-cell.a p,.cmp-row.del .cmp-cell.a .cmp-ch{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--danger) 60%,transparent)}
+.cmp-body del{background:color-mix(in srgb,var(--danger) 20%,transparent);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--danger) 70%,transparent);border-radius:2px}
+.cmp-body ins{background:color-mix(in srgb,var(--good) 24%,transparent);text-decoration:none;border-radius:2px}
+.cmp-cell.o{display:none}
+.cmp-body.one .cmp-cell.o{display:block}
+.cmp-body.one .cmp-cell.a,.cmp-body.one .cmp-cell.b{display:none}
+.cmp-row.del .cmp-cell.o{background:color-mix(in srgb,var(--danger) 10%,transparent);box-shadow:inset 3px 0 0 var(--danger)}
+.cmp-row.del .cmp-cell.o p{text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--danger) 60%,transparent)}
+.cmp-row.ins .cmp-cell.o{background:color-mix(in srgb,var(--good) 10%,transparent);box-shadow:inset 3px 0 0 var(--good)}
+.cmp-cell.o+.cmp-cell,.cmp-cell+.cmp-cell.o{border-left:0}
+.cmp-fold{display:block;width:calc(100% - 40px);margin:4px 20px;border:1px dashed var(--line);background:none;color:var(--page-ink-3);border-radius:8px;padding:6px;font:13px var(--ui)}
+.cmp-fold:hover{color:var(--page-ink);border-color:var(--page-ink-3)}
+.cmp-same{color:var(--page-ink-3);font:14px var(--ui);padding:40px 20px;text-align:center}
+@media (max-width:720px){.cmp-view{margin-left:0}.cmp-bar select{max-width:none}.cmp-bar label{flex:1;min-width:130px}.cmp-cell{padding:3px 12px}.modal.cmp{padding:16px}}
+.beside{width:min(38%,520px);flex:none;display:flex;flex-direction:column;min-height:0;border-left:1px solid var(--line);background:var(--desk)}
+.beside[hidden]{display:none}
+.bs-tabs{display:flex;align-items:center;gap:2px;padding:6px 8px 0;border-bottom:1px solid var(--line)}
+.bs-tabs [data-bt]{border:0;background:none;color:var(--ink-2);padding:7px 10px;font-size:13px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.bs-tabs [data-bt][aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.bs-tabs #bsClose{margin-left:auto}
+.beside [data-bp][hidden]{display:none}
+.bn-wrap{flex:1;min-height:0;overflow:auto;background:var(--page);color:var(--page-ink);display:flex;flex-direction:column}
+.bn-title{border:0;background:none;color:var(--page-ink);font-family:var(--head-font);font-size:1.35em;padding:18px 24px 4px;outline:none}
+.bn-title::placeholder{color:var(--page-ink-3)}
+.bn-ed{flex:1;padding:6px 24px 30vh;font-family:var(--body-font);font-size:15.5px;line-height:1.65;outline:none}
+.bn-ed p{margin:0 0 .6em}
+.bn-empty{padding:24px;font:14px/1.5 var(--ui)}
+.bn-empty div{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.bs-head{display:flex;gap:6px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}
+.bs-head select{flex:1;min-width:0;font:inherit;font-size:13px;color:var(--ink);background:var(--raise);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.bs-body{flex:1;overflow:auto;padding:18px 24px 30vh;background:var(--page);color:var(--page-ink);font-family:var(--body-font);font-size:15.5px;line-height:1.65;opacity:.93}
+.bs-body p{margin:0 0 .7em}
+.bs-body h2{font-family:var(--head-font);font-weight:500;font-size:1.3em;margin:1.4em 0 .6em}
+.bs-body hr{border:0;text-align:center;margin:.8em 0}
+.bs-body hr::after{content:var(--scene);color:var(--page-ink-3);letter-spacing:.3em}
+.bs-body blockquote{margin:.8em 1em;font-style:italic}
+.bs-note{font:12.5px var(--ui);color:var(--page-ink-3);margin:0 0 14px}
+@media (max-width:860px){.beside{position:fixed;left:0;right:0;bottom:0;width:auto;height:55vh;z-index:30;border-left:0;border-top:1px solid var(--line);box-shadow:0 -10px 30px rgba(0,0,0,.18)}}
 .htabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-top:-6px}
 .htabs button{border:0;background:none;color:var(--ink-2);padding:8px 12px;font-size:13.5px;border-bottom:2px solid transparent;margin-bottom:-1px}
 .htabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
@@ -984,7 +1074,7 @@ button.prof:hover{background:var(--raise)}
       </div>
       <div class="side-foot">
         <button class="btn ghost" id="bookSettingsBtn">Book settings</button>
-        <button class="btn ghost" id="historyBtn" title="Earlier versions and recent saves, including copies from your other computer">History</button>
+        <button class="btn ghost" id="historyBtn" title="Drafts, earlier versions and recent saves. Start a new draft or compare two">Drafts</button>
         <button class="btn ghost" id="exportBtn">Export</button>
       </div>
     </aside>
@@ -994,6 +1084,7 @@ button.prof:hover{background:var(--raise)}
         <button class="tb key ms-only" data-cmd="chapter" title="Start a new chapter here (Ctrl+Shift+Enter)">Chapter<span class="lg"> break</span></button>
         <button class="tb ms-only" data-cmd="scene" title="Scene break (Ctrl+Enter)">Scene<span class="lg"> break</span> <span class="k" id="sceneGlyphHint">* * *</span></button>
         <button class="tb" data-cmd="note" title="A letter, note or message inside the story">Letter</button>
+        <button class="tb" id="nbBtn" title="Open your notebook beside your writing (Ctrl+Shift+O)">Notebook</button>
         <button class="tb" id="mnoteBtn" title="Pin a private note to the words you've selected (Ctrl+Shift+M)">✎<span class="lg"> Note</span></button>
         <button class="tb icon touch-only" data-fmt2="bold" title="Bold" aria-label="Bold"><b>B</b></button>
         <button class="tb icon touch-only" data-fmt2="italic" title="Italic" aria-label="Italic"><i style="font-family:Georgia,serif">I</i></button>
@@ -1025,6 +1116,13 @@ button.prof:hover{background:var(--raise)}
         </article>
       </div>
     </div>
+    <aside class="beside" id="beside" hidden aria-label="Beside your writing">
+      <div class="bs-tabs" role="tablist"><button type="button" role="tab" data-bt="notes" aria-selected="true">Notebook</button><button type="button" role="tab" data-bt="drafts" aria-selected="false">Earlier drafts</button><button class="tb icon" id="bsClose" title="Close (Ctrl+Shift+O)" aria-label="Close the side panel">✕</button></div>
+      <div class="bs-head" data-bp="notes"><select id="bnPick" aria-label="Which notebook page"></select><button type="button" class="tb" id="bnNew" title="New notebook page">+ New</button><button type="button" class="tb" id="bnFull" title="Open this page full size">Full page</button></div>
+      <div class="bn-wrap" data-bp="notes"><input class="bn-title" id="bnTitle" placeholder="Page title" aria-label="Page title" autocomplete="off"><div class="bn-ed" id="bnEd" contenteditable="true" spellcheck="true" aria-label="Notebook page"></div><div class="bn-empty" id="bnEmpty" hidden><p>Your notebook is for characters, places and plot. It stays open here while you write.</p><div><button type="button" class="btn" data-bntpl="character">Character</button><button type="button" class="btn" data-bntpl="place">Place</button><button type="button" class="btn" data-bntpl="plot">Plot outline</button><button type="button" class="btn" data-bntpl="blank">Blank page</button></div></div></div>
+      <div class="bs-head" data-bp="drafts"><select id="bsPick" aria-label="Which draft"></select><select id="bsChap" aria-label="Go to chapter"></select></div>
+      <div class="bs-body" id="bsBody" data-bp="drafts"></div>
+    </aside>
   </section>
 </div>
 
@@ -1159,11 +1257,45 @@ button.prof:hover{background:var(--raise)}
 <!-- Versions -->
 <div class="scrim" id="historyModal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
-    <div class="actions"><h2 id="historyTitle">History</h2><div class="r"><button class="btn" id="verSave">Save a version now</button><button class="btn ghost" data-close>Close</button></div></div>
-    <div class="htabs" role="tablist"><button type="button" role="tab" data-ht="ver" aria-selected="true">Versions of this book</button><button type="button" role="tab" data-ht="rec" aria-selected="false">Last few saves of this page</button></div>
-    <div data-hp="ver"><p class="sub" id="verSub" style="margin:0 0 8px"></p><div id="verBody"></div></div>
+    <div class="actions"><h2 id="historyTitle">Drafts and history</h2><div class="r"><button class="btn" id="verSave">Save a version now</button><button class="btn ghost" data-close>Close</button></div></div>
+    <div class="htabs" role="tablist"><button type="button" role="tab" data-ht="dr" aria-selected="true">Drafts</button><button type="button" role="tab" data-ht="ver" aria-selected="false">Versions</button><button type="button" role="tab" data-ht="rec" aria-selected="false">Last few saves of this page</button></div>
+    <div data-hp="dr"><div id="drBody"></div></div>
+    <div data-hp="ver" hidden><p class="sub" id="verSub" style="margin:0 0 8px"></p><div id="verBody"></div></div>
     <div data-hp="rec" hidden><p class="sub" style="margin:0 0 8px">Every time this page is saved, the copy before it is kept on this computer, so a slip of the keyboard or a bad paste can be undone. Restoring one keeps the current text here too.</p><div id="recoveryList"></div></div>
     <p class="sub" style="margin:0;font-size:12.5px">Deleted books and notebook pages are in Trash, on your shelf.</p>
+  </div>
+</div>
+
+<!-- Start a new draft -->
+<div class="scrim" id="draftModal" hidden>
+  <form class="modal sm" id="draftForm">
+    <h2 id="dfTitle">Start a new draft</h2>
+    <p class="sub" id="dfText" style="margin:0"></p>
+    <div class="df-opts" role="radiogroup" aria-label="How to start">
+      <label><input type="radio" name="dfMode" value="copy" checked><span><b>Revise a copy</b><small>Draft <i data-dn></i> starts as an exact copy, and you rewrite over it.</small></span></label>
+      <label><input type="radio" name="dfMode" value="chapters"><span><b>Keep only the chapter titles</b><small>Same chapters, empty pages. Rewrite each one fresh.</small></span></label>
+      <label><input type="radio" name="dfMode" value="blank"><span><b>Start from a blank page</b><small>A full rewrite from nothing.</small></span></label>
+    </div>
+    <label class="f"><span>A note about Draft <i data-do></i> <small style="color:var(--ink-3)">(optional)</small></span><input type="text" id="dfNote" maxlength="120" placeholder="For example: the version my beta readers saw"></label>
+    <label class="df-beside"><input type="checkbox" id="dfBeside"><span>Open Draft <i data-do></i> beside me while I write</span></label>
+    <div class="actions"><div class="r"><button type="button" class="btn" data-close>Cancel</button><button type="submit" class="btn primary" id="dfGo">Start</button></div></div>
+  </form>
+</div>
+
+<!-- Compare two drafts -->
+<div class="scrim" id="compareModal" hidden>
+  <div class="modal cmp" role="dialog" aria-modal="true" aria-labelledby="cmpTitle">
+    <div class="actions"><h2 id="cmpTitle">Compare</h2><div class="r"><button class="btn ghost" data-close>Close</button></div></div>
+    <div class="cmp-bar">
+      <label><span>Older</span><select id="cmpA"></select></label>
+      <button type="button" class="btn ghost cmp-swap" id="cmpSwap" title="Swap" aria-label="Swap sides">⇄</button>
+      <label><span>Newer</span><select id="cmpB"></select></label>
+      <div class="cmp-view" role="group" aria-label="Layout"><button type="button" data-cv="side" aria-pressed="true">Side by side</button><button type="button" data-cv="one" aria-pressed="false">One column</button></div>
+      <label class="cmp-all"><input type="checkbox" id="cmpAll"> Show unchanged text</label>
+    </div>
+    <div class="cmp-sum" id="cmpSum"></div>
+    <div class="cmp-chips" id="cmpChips"></div>
+    <div class="cmp-body" id="cmpBody"></div>
   </div>
 </div>
 
@@ -2502,6 +2634,7 @@ $("#continueBtn").addEventListener("click", e => openBook(e.currentTarget.datase
 async function openBook(id) {
   storeEditorPosition();
   flushPending();
+  if (beside.bookId && beside.bookId !== id) closeBeside();
   cur.bookId = id; let b = book(); if (!b) return;
   show("desk");
   ed.innerHTML = ""; ed.contentEditable = "false"; loadingPage = true; ed.dataset.ph = "Opening…"; checkEmpty();
@@ -2601,7 +2734,7 @@ function renderSideStatic() {
 function updateSideStats() {
   const b = book(); if (!b) return;
   const w = b.words || 0;
-  $("#sideStats").textContent = `${fmt(w)} words` + (b.target ? ` of ${fmt(b.target)}` : "");
+  $("#sideStats").textContent = ((b.draftNo || 1) > 1 ? `Draft ${b.draftNo} · ` : "") + `${fmt(w)} words` + (b.target ? ` of ${fmt(b.target)}` : "");
   $("#sideProg").style.width = b.target ? Math.min(100, w / b.target * 100) + "%" : "0";
   $("#sideProgWrap").hidden = !b.target;
 }
@@ -2635,6 +2768,7 @@ function restoreEditorPosition(b, pid) {
 async function openPage(pid) {
   storeEditorPosition();
   flushPending();
+  if (typeof side !== "undefined" && side.noteId === pid) { flushSideNote(); side.noteId = null; if (!$("#beside").hidden && side.tab === "notes") $("#beside").hidden = true; }
   const b = book(); if (!b) return;
   cur.page = pid; b.lastPage = pid;
   const isMs = pid === "ms";
@@ -2804,9 +2938,11 @@ $("#notes").addEventListener("click", async e => {
     if (cur.page === id && saveTimer) commitPage();
     try { const data = await loadNote(id); storeTrash({kind:"note", id:uid(), at:Date.now(), bookId:b.id, meta:{...meta, title:seal(meta.title || "")}, html:seal(data.html)}); } catch(e) { toast(e.message); return; }
     b.notes = b.notes.filter(n => n.id !== id); b.goneNotes = [...new Set([...(b.goneNotes || []), id])]; noteCache.delete(id); lsDel("semi.note." + id); saveLib();
+    if (side.noteId === id) { side.dirty = false; side.noteId = null; if (!$("#beside").hidden && side.tab === "notes") openNoteBeside(null); }
     if (cur.page === id) openPage("ms"); else renderNotes();
     return;
   }
+  if (cur.page === "ms" && id !== side.noteId || !$("#beside").hidden && side.tab === "notes" && cur.page === "ms") return openNoteBeside(id);
   if (id !== cur.page) openPage(id);
 });
 const TPL = {
@@ -2818,10 +2954,7 @@ $("#newNote").addEventListener("click", e => { e.stopPropagation(); const m = $(
 document.addEventListener("mousedown", e => { if (!e.target.closest("#npMenu") && !e.target.closest("#newNote")) $("#npMenu").hidden = true; });
 $("#npMenu").addEventListener("click", async e => {
   const x = e.target.closest("[data-tpl]"); if (!x) return; $("#npMenu").hidden = true;
-  const b = book(), t = TPL[x.dataset.tpl], n = {id:uid(), title:t ? t[0] : ""};
-  writeNote(n.id, t ? t[1].map(h => `<p><strong>${esc(h)}</strong></p><p><br></p>`).join("") : "<p></p>");
-  b.notes.push(n); b.notesOpen = true; saveLib(); await openPage(n.id);
-  if (t) { $("#noteTitle").focus(); $("#noteTitle").select(); }
+  await newNotePage(x.dataset.tpl);
 });
 const TARGETS = [["Novel", 80000], ["Fantasy", 100000], ["Romance", 70000], ["Thriller", 80000], ["YA", 65000], ["Middle grade", 45000], ["Novella", 30000]];
 function renderTargets() { const v = +$("#bkTarget").value || 0; $("#bkTargets").innerHTML = TARGETS.map(([n, w]) => `<button type="button" data-tw="${w}" class="${v === w ? "on" : ""}">${n} · ${w / 1000}k</button>`).join(""); }
@@ -3368,14 +3501,16 @@ async function makeVersion(b0, html, why) {
   try {
     const d = document.createElement("div"); d.innerHTML = html;
     const words = countWords(d.textContent), last = (b0.versions || [])[0];
-    if (last && verCache.get(last.id) === html && why !== "manual") return null;
+    if (last && verCache.get(last.id) === html && why !== "manual" && why !== "draft") return null;
     const v = {id:"v" + uid(), at:Date.now(), words, len:html.length, why, store:S.mode === "db" ? "db" : "idb", parts:1};
     v.parts = await putVersionData(v, html);
     verCache.set(v.id, html); while (verCache.size > 4) verCache.delete(verCache.keys().next().value);
     const b = lib.books.find(x => x.id === b0.id); if (!b) { dropVersionData(v); return null; }
     b.versions = b.versions || []; b.versions.unshift(v);
-    while (b.versions.length > VER_MAX) { // drop the oldest automatic one; ones you saved yourself go last
-      let k = b.versions.length - 1; for (let i = b.versions.length - 1; i > 0; i--) if (b.versions[i].why !== "manual") { k = i; break; }
+    while (b.versions.filter(x => x.why !== "draft").length > VER_MAX) { // drop the oldest automatic one; ones you saved yourself go last; drafts are kept for good
+      let k = -1; for (let i = b.versions.length - 1; i > 0; i--) if (b.versions[i].why !== "manual" && b.versions[i].why !== "draft") { k = i; break; }
+      if (k < 0) for (let i = b.versions.length - 1; i > 0; i--) if (b.versions[i].why !== "draft") { k = i; break; }
+      if (k < 0) break;
       // Remove it from the list, but retain its stored data for emergency rescue.
       b.versions.splice(k, 1);
     }
@@ -3391,22 +3526,24 @@ function relTime(t) {
   if (d.toDateString() === y.toDateString()) return "Yesterday, " + time;
   return d.toLocaleDateString([], {day:"numeric", month:"short", year:d.getFullYear() !== now.getFullYear() ? "numeric" : undefined}) + ", " + time;
 }
-const WHY = {open:"when you opened the book", auto:"while you wrote", manual:"saved by you", restore:"just before a restore", other:"from your other computer"};
+const WHY = {draft:"a finished draft", open:"when you opened the book", auto:"while you wrote", manual:"saved by you", restore:"just before a restore", other:"from your other computer"};
 async function currentMs(b) { flushPending(); return cur.page === "ms" && cur.bookId === b.id ? cleanHTML(ed) : await loadMs(b); }
 function historyTab(t) {
   $$("#historyModal [data-ht]").forEach(b => b.setAttribute("aria-selected", String(b.dataset.ht === t)));
   $$("#historyModal [data-hp]").forEach(p => p.hidden = p.dataset.hp !== t);
   $("#verSave").hidden = t !== "ver";
+  histTabNow = t;
 }
+let histTabNow = "dr";
 function openHistory() {
   const b = book(); if (!b) return;
   const every = Math.round(VER_EVERY / 60000);
   $("#verSub").textContent = `A copy of the whole book is kept when you open it and every ${every} minute${every === 1 ? "" : "s"} while you write, plus any copy from your other computer. The last ${VER_MAX} are kept${S.mode === "db" ? " in your account" : " in this browser"}. Notebook pages aren't included.`;
-  renderVersions(); historyTab("ver"); $("#historyModal").hidden = false;
+  renderDrafts(); historyTab("dr"); $("#historyModal").hidden = false;
 }
-$("#historyModal").addEventListener("click", e => { const t = e.target.closest("[data-ht]"); if (!t) return; if (t.dataset.ht === "rec") showRecovery(); else { renderVersions(); historyTab("ver"); } });
+$("#historyModal").addEventListener("click", e => { const t = e.target.closest("[data-ht]"); if (!t) return; if (t.dataset.ht === "rec") showRecovery(); else if (t.dataset.ht === "dr") { renderDrafts(); historyTab("dr"); } else { renderVersions(); historyTab("ver"); } });
 function renderVersions() {
-  const b = book(), vs = (b && b.versions) || [];
+  const b = book(), vs = ((b && b.versions) || []).filter(v => v.why !== "draft");
   $("#verSave").hidden = false;
   $("#verBody").innerHTML = vs.length
     ? `<ul class="ver-list">${vs.map(v => `<li><div class="when"><b>${esc(relTime(v.at))}</b><small>${fmt(v.words)} words · ${esc(WHY[v.why] || "")}</small></div><button class="btn ghost" data-vp="${esc(v.id)}">Preview</button><button class="btn" data-vr="${esc(v.id)}">Restore</button></li>`).join("")}</ul>`
@@ -3420,8 +3557,8 @@ async function previewVersion(v) {
   const s = styleOf(b), c = {ch:0, part:0};
   d.querySelectorAll(":scope > h2.chap").forEach(h => { const lab = labelFor(h, s, c), t = h.textContent.trim(); h.textContent = [lab, t].filter(Boolean).join(": ") || "Chapter"; });
   $("#verSave").hidden = true;
-  $("#verBody").innerHTML = `<p class="sub" style="margin:0 0 10px"><b>${esc(relTime(v.at))}</b> · ${fmt(v.words)} words</p><div class="ver-prev">${d.innerHTML}</div>
-    <div class="actions"><button class="btn" data-vback>← All versions</button><div class="r"><button class="btn" data-vdl="${esc(v.id)}">Download as text</button><button class="btn primary" data-vr="${esc(v.id)}">Restore this version</button></div></div>`;
+  $("#verBody").innerHTML = `<p class="sub" style="margin:0 0 10px"><b>${esc(v.name || relTime(v.at))}</b> · ${v.name ? esc(relTime(v.at)) + " · " : ""}${fmt(v.words)} words</p><div class="ver-prev">${d.innerHTML}</div>
+    <div class="actions"><button class="btn" data-vback>← ${verBackTo === "dr" ? "All drafts" : "All versions"}</button><div class="r"><button class="btn" data-vdl="${esc(v.id)}">Download as text</button><button class="btn primary" data-vr="${esc(v.id)}">Restore this version</button></div></div>`;
 }
 async function restoreVersion(v) {
   const b = book(); if (!b) return;
@@ -3459,11 +3596,377 @@ $("#verBody").addEventListener("click", async e => {
   const b = book(); if (!b) return;
   const find1 = id => (b.versions || []).find(v => v.id === id);
   const p = e.target.closest("[data-vp]"), r = e.target.closest("[data-vr]"), dl = e.target.closest("[data-vdl]");
-  if (e.target.closest("[data-vback]")) return renderVersions();
+  if (e.target.closest("[data-vback]")) { if (verBackTo === "dr") { verBackTo = null; renderDrafts(); return historyTab("dr"); } return renderVersions(); }
   if (p) return previewVersion(find1(p.dataset.vp));
   if (r) return restoreVersion(find1(r.dataset.vr));
   if (dl) { const v = find1(dl.dataset.vdl); try { const safe = b.title.replace(/[^\p{L}\p{N} _-]+/gu, "").trim() || "book"; saveFile(`${safe} (${new Date(v.at).toLocaleDateString("en-CA")}).txt`, versionText(b, await getVersionData(v)), "text/plain"); } catch (err) { toast(err.message); } }
 });
+
+/* ---------- Drafts: keep a finished draft, write the next one over it, compare any two ---------- */
+let verBackTo = null;
+const draftsOf = b => ((b && b.versions) || []).filter(v => v.why === "draft").sort((x, y) => (x.draft || 0) - (y.draft || 0));
+function renderDrafts() {
+  const b = book(); if (!b) return;
+  const n = b.draftNo || 1, ds = draftsOf(b);
+  $("#verSave").hidden = true;
+  $("#drBody").innerHTML = `<div class="dr-top"><p class="sub">${ds.length ? "Finished drafts are kept exactly as they were, for good. Read one, keep it open beside your writing, or see what changed." : "When a draft is done, start the next one. This draft is kept exactly as it is, and you can read it, keep it open beside you, or compare the two any time."}</p>
+    <button class="btn primary" id="drNew">Start Draft ${n + 1}</button>${ds.length ? `<button class="btn" data-dcmp="">Compare…</button>` : ""}</div>
+    <ul class="dr-list"><li class="now"><div class="when"><b>Draft ${n}</b><small>Writing now · ${fmt(b.words || 0)} words</small></div></li>
+    ${ds.slice().reverse().map(v => `<li><div class="when"><b>${esc(v.name || "Draft " + v.draft)}</b><small>Finished ${esc(relTime(v.at).replace(/^Today/, "today").replace(/^Yesterday/, "yesterday"))} · ${fmt(v.words)} words</small>${v.note ? `<em>${esc(v.note)}</em>` : ""}</div>
+      <button class="btn ghost" data-dread="${esc(v.id)}">Read</button><button class="btn ghost" data-dbes="${esc(v.id)}">Open beside</button><button class="btn" data-dcmp="${esc(v.id)}">Compare with now</button></li>`).join("")}</ul>`;
+}
+$("#drBody").addEventListener("click", e => {
+  const b = book(); if (!b) return;
+  const find1 = id => (b.versions || []).find(v => v.id === id);
+  const r = e.target.closest("[data-dread]"), bs = e.target.closest("[data-dbes]"), c = e.target.closest("[data-dcmp]");
+  if (e.target.closest("#drNew")) return openNewDraft();
+  if (r) { verBackTo = "dr"; historyTab("ver"); return previewVersion(find1(r.dataset.dread)); }
+  if (bs) { $("#historyModal").hidden = true; return openBeside(bs.dataset.dbes); }
+  if (c) { $("#historyModal").hidden = true; const ds = draftsOf(b); return openCompare(c.dataset.dcmp || (ds[ds.length - 1] || {}).id, "now"); }
+});
+
+function openNewDraft() {
+  const b = book(); if (!b) return;
+  if (edit.ro) return toast("This book is being edited somewhere else. Press Edit here instead first.");
+  if (S.mode === "memory") return toast("This browser isn't keeping anything, so a draft can't be kept. Download a backup instead.");
+  const n = b.draftNo || 1;
+  $("#dfTitle").textContent = `Start Draft ${n + 1}`;
+  $("#dfText").textContent = `Draft ${n} (${fmt(b.words || 0)} words) is kept exactly as it is now. You can read it, open it beside your writing, or compare it with the new draft any time.`;
+  $$("#draftModal [data-dn]").forEach(x => x.textContent = n + 1); $$("#draftModal [data-do]").forEach(x => x.textContent = n);
+  $("#dfGo").textContent = `Start Draft ${n + 1}`;
+  $("#draftForm").elements.dfMode.value = "copy"; $("#dfNote").value = ""; $("#dfBeside").checked = false;
+  $("#historyModal").hidden = true; $("#draftModal").hidden = false;
+}
+$("#draftForm").addEventListener("change", e => { if (e.target.name === "dfMode") $("#dfBeside").checked = e.target.value !== "copy"; });
+$("#draftForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const mode = $("#draftForm").elements.dfMode.value, note = $("#dfNote").value.trim(), beside = $("#dfBeside").checked;
+  $("#dfGo").disabled = true;
+  try { await startNewDraft(mode, note, beside); } finally { $("#dfGo").disabled = false; }
+});
+async function startNewDraft(mode, note, beside) {
+  const b0 = book(); if (!b0) return;
+  const html = await currentMs(b0);
+  if (!html || !html.replace(/<[^>]*>/g, "").trim()) { $("#draftModal").hidden = true; return toast("This draft is still empty. Write something first."); }
+  for (let i = 0; i < 40 && verBusy.has(b0.id); i++) await new Promise(r => setTimeout(r, 100));
+  const v = await makeVersion(b0, html, "draft");
+  const b = book();
+  if (!v || !b) { $("#draftModal").hidden = true; return toast("The draft couldn't be kept, so nothing was changed. Try again, or download a backup first.", 7000); }
+  const n = b.draftNo || 1;
+  v.draft = n; v.name = `Draft ${n}`; if (note) v.note = note;
+  b.draftNo = n + 1; saveLib();
+  if (mode !== "copy") {
+    let next = "<p><br></p>";
+    if (mode === "chapters") {
+      const d = document.createElement("div"); d.innerHTML = html;
+      const heads = Array.from(d.children).filter(isChap);
+      if (heads.length) next = heads.map(h => h.outerHTML + "<p><br></p>").join("");
+    }
+    replaceMsKeepToday(b, sanitize(next));
+  }
+  $("#draftModal").hidden = true;
+  updateSideStats();
+  if (beside || mode !== "copy") openBeside(v.id);
+  toast(`Draft ${n + 1} started. Draft ${n} is kept in Drafts.`, 5000);
+}
+/* Swap the whole manuscript without counting it as words written or deleted today */
+function replaceMsKeepToday(b, html) {
+  const base = todayBase(), had = b.id in base.books, net = had ? (b.words || 0) - base.books[b.id] : 0;
+  if (cur.page === "ms" && cur.bookId === b.id) {
+    histCommit(); ed.innerHTML = html; checkEmpty(); histCommit();
+    clearTimeout(countT); countT = null; recount(true);
+    clearTimeout(saveTimer); commitPage();
+    $("#scroller").scrollTop = 0;
+  } else {
+    writeMs(b, html); const d = document.createElement("div"); d.innerHTML = html;
+    b.words = countWords(Array.from(d.children).filter(n => !isChap(n)).map(n => n.textContent).join(" ")); b.chapters = d.querySelectorAll(":scope > h2.chap").length;
+  }
+  if (had) base.books[b.id] = (b.words || 0) - net; else base.books[b.id] = b.words || 0;
+  lib.stats.days[base.day] = todayWords(); updateGoalUI(); saveLib();
+}
+
+/* Read an earlier draft beside your writing */
+var beside = {bookId:null, id:null};
+function besideSources(b) {
+  const ds = draftsOf(b), vs = (b.versions || []).filter(v => v.why !== "draft");
+  return [...ds.slice().reverse().map(v => ({v, label:v.name || "Draft " + v.draft})), ...vs.map(v => ({v, label:"Version · " + relTime(v.at)}))];
+}
+async function openBeside(id) {
+  const b = book(); if (!b) return;
+  const src = besideSources(b);
+  if (!src.length) { beside.bookId = b.id; showSideTab("drafts"); $("#bsPick").innerHTML = ""; $("#bsChap").innerHTML = ""; $("#bsBody").innerHTML = `<p class="bs-note">No earlier drafts yet. When this draft is done, open Drafts and press Start a new draft. The old one appears here so you can read it while you rewrite.</p>`; return; }
+  const pick = src.find(x => x.v.id === id) || src[0];
+  beside.bookId = b.id; beside.id = pick.v.id; showSideTab("drafts");
+  $("#bsPick").innerHTML = src.map(x => `<option value="${esc(x.v.id)}"${x.v.id === pick.v.id ? " selected" : ""}>${esc(x.label)}</option>`).join("");
+  $("#bsBody").innerHTML = `<p class="bs-note">Opening…</p>`; $("#bsChap").innerHTML = "";
+  let html; try { html = await getVersionData(pick.v); } catch (err) { $("#bsBody").innerHTML = `<p class="bs-note">${esc(err.message)}</p>`; return; }
+  if (beside.id !== pick.v.id) return;
+  const d = document.createElement("div"); d.innerHTML = sanitize(html);
+  const s = styleOf(b), c = {ch:0, part:0}, chaps = [];
+  d.querySelectorAll(":scope > h2.chap").forEach((h, i) => { const lab = labelFor(h, s, c), t = h.textContent.trim(); h.textContent = [lab, t].filter(Boolean).join(": ") || "Chapter"; h.removeAttribute("class"); h.id = "bsc" + i; chaps.push(h.textContent); });
+  d.querySelectorAll("mark").forEach(m => m.replaceWith(...m.childNodes));
+  d.querySelectorAll(":scope > p").forEach(p => { if (!p.textContent.trim()) p.remove(); });
+  $("#bsChap").innerHTML = `<option value="">${chaps.length ? "Go to chapter…" : "No chapters"}</option>` + chaps.map((t, i) => `<option value="${i}">${esc(t)}</option>`).join("");
+  $("#bsChap").hidden = !chaps.length;
+  $("#bsBody").innerHTML = `<p class="bs-note">${esc(pick.label)} · ${fmt(pick.v.words)} words · read only</p>` + d.innerHTML;
+  $("#bsBody").scrollTop = 0;
+}
+function closeBeside() { flushSideNote(); $("#beside").hidden = true; beside.bookId = beside.id = null; side.noteId = null; $("#bsBody").innerHTML = ""; }
+$("#bsPick").addEventListener("change", e => openBeside(e.target.value));
+$("#bsChap").addEventListener("change", e => { const h = $("#bsc" + e.target.value); if (h) $("#bsBody").scrollTop = h.offsetTop - $("#bsBody").offsetTop - 10; e.target.value = ""; });
+$("#bsClose").addEventListener("click", closeBeside);
+
+/* Compare: paragraph-by-paragraph, then word-by-word inside the paragraphs that changed */
+function myers(a, b, limit) {
+  const n = a.length, m = b.length, max = n + m, off = max + 1, v = new Int32Array(2 * max + 3), trace = [];
+  for (let d = 0; d <= max; d++) {
+    if (d > limit) return null;
+    trace.push(v.slice(off - d - 1, off + d + 2));
+    for (let k = -d; k <= d; k += 2) {
+      let x = (k === -d || (k !== d && v[off + k - 1] < v[off + k + 1])) ? v[off + k + 1] : v[off + k - 1] + 1, y = x - k;
+      while (x < n && y < m && a[x] === b[y]) { x++; y++; }
+      v[off + k] = x;
+      if (x >= n && y >= m) {
+        const ops = []; let X = n, Y = m;
+        for (let D = d; D > 0; D--) {
+          const t = trace[D], g = kk => t[kk + D + 1], K = X - Y;
+          const down = K === -D || (K !== D && g(K - 1) < g(K + 1)), pk = down ? K + 1 : K - 1, px = g(pk), py = px - pk;
+          const sx = down ? px : px + 1, sy = down ? py + 1 : py;
+          while (X > sx && Y > sy) { ops.push([0, X - 1, Y - 1]); X--; Y--; }
+          ops.push(down ? [2, -1, Y - 1] : [1, X - 1, -1]); X = px; Y = py;
+        }
+        while (X > 0 && Y > 0) { ops.push([0, X - 1, Y - 1]); X--; Y--; }
+        return ops.reverse();
+      }
+    }
+  }
+  return null;
+}
+function diffList(a, b, limit) { // common start and end first, so big books stay quick
+  let s = 0; while (s < a.length && s < b.length && a[s] === b[s]) s++;
+  let e = 0; while (e < a.length - s && e < b.length - s && a[a.length - 1 - e] === b[b.length - 1 - e]) e++;
+  const mid = myers(a.slice(s, a.length - e), b.slice(s, b.length - e), limit);
+  const ops = [];
+  for (let i = 0; i < s; i++) ops.push([0, i, i]);
+  if (mid) for (const [t, i, j] of mid) ops.push([t, t === 2 ? -1 : i + s, t === 1 ? -1 : j + s]);
+  else { for (let i = s; i < a.length - e; i++) ops.push([1, i, -1]); for (let j = s; j < b.length - e; j++) ops.push([2, -1, j]); }
+  for (let i = 0; i < e; i++) ops.push([0, a.length - e + i, b.length - e + i]);
+  return ops;
+}
+function cmpBlocks(b, html) {
+  const d = document.createElement("div"); d.innerHTML = sanitize(html);
+  const s = styleOf(b), c = {ch:0, part:0};
+  return Array.from(d.children).map(n => {
+    if (isChap(n)) { const lab = labelFor(n, s, c), t = n.textContent.trim(); return {k:"ch", text:t, show:[lab, t].filter(Boolean).join(": ") || "Chapter"}; }
+    if (n.tagName === "HR") return {k:"hr", text:"", show:s.scene || "* * *"};
+    return {k:"p", text:n.textContent.replace(/\s+/g, " ").trim()};
+  }).filter(x => x.k !== "p" || x.text);
+}
+const keyOf = x => x.k + "|" + x.text;
+const wordSet = t => new Set((t.toLowerCase().match(WORD_TOKEN) || []));
+function similar(x, y) {
+  if (x.k !== y.k) return 0; if (x.k !== "p") return 1;
+  const A = wordSet(x.text), B = wordSet(y.text); if (!A.size || !B.size) return 0;
+  let n = 0; for (const w of A) if (B.has(w)) n++;
+  const small = Math.min(A.size, B.size); // a short paragraph that grew into a longer one still counts as the same paragraph
+  return Math.max(n / (A.size + B.size - n), small >= 2 ? .8 * n / small : 0);
+}
+function wordDiff(x, y) {
+  const tok = t => t.match(/\s+|[\p{L}\p{N}’'-]+|[^\s\p{L}\p{N}]/gu) || [];
+  const A = tok(x), B = tok(y), ops = diffList(A, B, 1500);
+  let a = "", b = "", o = "", add = 0, del = 0, run = null, buf = "";
+  const flush = () => { if (!run) return; const h = esc(buf); if (run === 1) { a += `<del>${h}</del>`; o += `<del>${h}</del>`; del += countWords(buf); } else { b += `<ins>${h}</ins>`; o += `<ins>${h}</ins>`; add += countWords(buf); } run = null; buf = ""; };
+  for (const [t, i, j] of ops) {
+    if (t === 0) { if (run && /^\s+$/.test(A[i])) { buf += A[i]; continue; } flush(); const h = esc(A[i]); a += h; b += h; o += h; }
+    else { const tk = t === 1 ? A[i] : B[j]; if (run && run !== t) flush(); run = t; buf += tk; }
+  }
+  flush();
+  return {a, b, o, add, del};
+}
+function diffBooks(A, B) {
+  const ops = diffList(A.map(keyOf), B.map(keyOf), 2500), rows = [];
+  let dels = [], inss = [];
+  const settle = () => { // pair a removed paragraph with the added one it most looks like: that's an edit
+    let j = 0;
+    for (const i of dels) {
+      let best = -1, bs = .3;
+      for (let q = j; q < Math.min(inss.length, j + 4); q++) { const sc = similar(A[i], B[inss[q]]); if (sc > bs) { bs = sc; best = q; } }
+      if (best < 0) { rows.push({t:"del", a:A[i]}); continue; }
+      for (; j < best; j++) rows.push({t:"ins", b:B[inss[j]]});
+      rows.push({t:"mod", a:A[i], b:B[inss[best]]}); j = best + 1;
+    }
+    for (; j < inss.length; j++) rows.push({t:"ins", b:B[inss[j]]});
+    dels = []; inss = [];
+  };
+  for (const [t, i, j] of ops) {
+    if (t === 0) { settle(); rows.push({t:"same", a:A[i], b:B[j]}); }
+    else if (t === 1) dels.push(i); else inss.push(j);
+  }
+  settle();
+  return rows;
+}
+const cmp = {view:"side", rows:null, a:null, b:null, open:new Set()};
+function cmpSources(b) {
+  const n = b.draftNo || 1, ds = draftsOf(b), vs = (b.versions || []).filter(v => v.why !== "draft");
+  return [{id:"now", label:`Now (Draft ${n})`}, ...ds.slice().reverse().map(v => ({id:v.id, v, label:v.name || "Draft " + v.draft})), ...vs.map(v => ({id:v.id, v, label:"Version · " + relTime(v.at)}))];
+}
+function openCompare(a, b2) {
+  const b = book(); if (!b) return;
+  const src = cmpSources(b); if (src.length < 2) return toast("There's nothing to compare yet. Start a new draft, or wait for a version to be saved.");
+  if (!src.some(x => x.id === a)) a = src[1].id;
+  if (!src.some(x => x.id === b2) || b2 === a) b2 = a === "now" ? src[1].id : "now";
+  const opts = sel => src.map(x => `<option value="${esc(x.id)}"${x.id === sel ? " selected" : ""}>${esc(x.label)}</option>`).join("");
+  $("#cmpA").innerHTML = opts(a); $("#cmpB").innerHTML = opts(b2);
+  if (matchMedia("(max-width:720px)").matches) cmp.view = "one";
+  $$("[data-cv]").forEach(x => x.setAttribute("aria-pressed", String(x.dataset.cv === cmp.view)));
+  $("#compareModal").hidden = false; runCompare();
+}
+async function cmpHTML(b, id) {
+  if (id === "now") return currentMs(b);
+  const v = (b.versions || []).find(x => x.id === id); if (!v) throw new Error("That draft couldn't be found.");
+  return getVersionData(v);
+}
+let cmpRun = 0;
+async function runCompare() {
+  const b = book(); if (!b) return;
+  const a = $("#cmpA").value, b2 = $("#cmpB").value, my = ++cmpRun, src = cmpSources(b), lab = id => (src.find(x => x.id === id) || {}).label || "";
+  cmp.la = lab(a); cmp.lb = lab(b2); cmp.open = new Set();
+  $("#cmpBody").innerHTML = `<div class="cmp-same">Comparing…</div>`; $("#cmpSum").textContent = ""; $("#cmpChips").innerHTML = "";
+  let ha, hb; try { [ha, hb] = await Promise.all([cmpHTML(b, a), cmpHTML(b, b2)]); } catch (err) { $("#cmpBody").innerHTML = `<div class="cmp-same">${esc(err.message)}</div>`; return; }
+  if (my !== cmpRun) return;
+  await new Promise(r => setTimeout(r, 20));
+  cmp.rows = diffBooks(cmpBlocks(b, ha), cmpBlocks(b, hb));
+  let add = 0, del = 0, changed = 0, chap = null, chips = [], ci = -1;
+  cmp.rows.forEach((r, i) => {
+    const h = (r.b || r.a); if (h.k === "ch") { chap = {name:h.show, n:0, at:i}; chips.push(chap); }
+    if (r.t === "same") return;
+    changed++; if (chap) chap.n++; else { if (!chips.length || chips[0].name !== "Start") chips.unshift({name:"Start", n:0, at:0}); chips[0].n++; }
+    if (r.t === "mod") { r.w = wordDiff(r.a.text, r.b.text); add += r.w.add; del += r.w.del; }
+    else if (r.t === "ins") add += countWords(r.b.text); else del += countWords(r.a.text);
+  });
+  cmp.chips = chips.filter(c => c.n);
+  $("#cmpSum").innerHTML = a === b2 ? "These are the same." : changed
+    ? `From <b>${esc(cmp.la)}</b> to <b>${esc(cmp.lb)}</b>: <b class="add">${fmt(add)} words added</b>, <b class="del">${fmt(del)} taken out</b>, ${fmt(changed)} paragraph${changed === 1 ? "" : "s"} changed.`
+    : `No changes between <b>${esc(cmp.la)}</b> and <b>${esc(cmp.lb)}</b>.`;
+  $("#cmpChips").innerHTML = cmp.chips.length > 1 ? cmp.chips.map((c, i) => `<button type="button" data-cj="${c.at}">${esc(c.name)} <span>${c.n}</span></button>`).join("") : "";
+  renderCompare();
+}
+function cmpCell(x) {
+  if (!x) return "";
+  return x.k === "ch" ? `<div class="cmp-ch">${esc(x.show)}</div>` : x.k === "hr" ? `<div class="cmp-hr">${esc(x.show)}</div>` : `<p>${esc(x.text)}</p>`;
+}
+function cmpRowHTML(r, i) {
+  let a, b, o;
+  if (r.t === "mod") { a = `<p>${r.w.a}</p>`; b = `<p>${r.w.b}</p>`; o = `<p>${r.w.o}</p>`; if (r.a.k === "ch") { a = `<div class="cmp-ch">${r.w.a}</div>`; b = `<div class="cmp-ch">${r.w.b}</div>`; o = `<div class="cmp-ch">${r.w.o}</div>`; } }
+  else { a = cmpCell(r.a); b = cmpCell(r.b); o = r.t === "del" ? a : b; }
+  return `<div class="cmp-row ${r.t}" data-ci="${i}"><div class="cmp-cell a">${a}</div><div class="cmp-cell b">${b}</div><div class="cmp-cell o">${o}</div></div>`;
+}
+function renderCompare() {
+  const body = $("#cmpBody"), rows = cmp.rows || [], all = $("#cmpAll").checked;
+  body.classList.toggle("one", cmp.view === "one");
+  if (!rows.length) { body.innerHTML = `<div class="cmp-same">Both are empty.</div>`; return; }
+  let html = `<div class="cmp-cols"><div>${esc(cmp.la)}</div><div>${esc(cmp.lb)}</div></div>`, i = 0;
+  while (i < rows.length) {
+    if (rows[i].t !== "same" || all) { html += cmpRowHTML(rows[i], i); i++; continue; }
+    let j = i; while (j < rows.length && rows[j].t === "same") j++;
+    // keep one paragraph of context each side and every chapter heading; fold the rest
+    const keep = new Set([i, j - 1].filter(x => (x === i && i > 0) || (x === j - 1 && j < rows.length)));
+    let k = i;
+    while (k < j) {
+      if (keep.has(k) || rows[k].a.k === "ch" || cmp.open.has(k)) { html += cmpRowHTML(rows[k], k); k++; continue; }
+      let e = k; while (e < j && !keep.has(e) && rows[e].a.k !== "ch" && !cmp.open.has(e)) e++;
+      const n = e - k;
+      html += n < 3 ? rows.slice(k, e).map((r, q) => cmpRowHTML(r, k + q)).join("") : `<button type="button" class="cmp-fold" data-fold="${k}-${e}">${n} paragraphs the same · show</button>`;
+      k = e;
+    }
+    i = j;
+  }
+  body.innerHTML = html;
+}
+$("#cmpA").addEventListener("change", runCompare);
+$("#cmpB").addEventListener("change", runCompare);
+$("#cmpSwap").addEventListener("click", () => { const a = $("#cmpA").value; $("#cmpA").value = $("#cmpB").value; $("#cmpB").value = a; runCompare(); });
+$("#cmpAll").addEventListener("change", renderCompare);
+$("#compareModal").addEventListener("click", e => {
+  const v = e.target.closest("[data-cv]"), f = e.target.closest("[data-fold]"), j = e.target.closest("[data-cj]");
+  if (v) { cmp.view = v.dataset.cv; $$("[data-cv]").forEach(x => x.setAttribute("aria-pressed", String(x === v))); renderCompare(); }
+  if (f) { const [k, e2] = f.dataset.fold.split("-").map(Number); for (let q = k; q < e2; q++) cmp.open.add(q); const top = $("#cmpBody").scrollTop; renderCompare(); $("#cmpBody").scrollTop = top; }
+  if (j) { const el = $(`#cmpBody [data-ci="${j.dataset.cj}"]`) || [...$$("#cmpBody [data-ci]")].find(x => +x.dataset.ci >= +j.dataset.cj); if (el) $("#cmpBody").scrollTop = el.offsetTop - 40; }
+});
+
+/* ---------- The side panel's Notebook tab: notes open beside the manuscript, and save as you type ---------- */
+var side = {noteId:null, t:null, dirty:false, last:{}};
+function showSideTab(t) {
+  const b = book(); if (b) beside.bookId = b.id;
+  $("#beside").hidden = false; side.tab = t;
+  $$("#beside [data-bt]").forEach(x => x.setAttribute("aria-selected", String(x.dataset.bt === t)));
+  $$("#beside [data-bp]").forEach(x => x.hidden = x.dataset.bp !== t);
+  $("#deskView").classList.remove("side-open");
+}
+function flushSideNote() {
+  clearTimeout(side.t); side.t = null;
+  if (!side.dirty || !side.noteId) return;
+  side.dirty = false;
+  const b = book(); if (!b || !b.notes.some(n => n.id === side.noteId)) return;
+  writeNote(side.noteId, sanitize($("#bnEd").innerHTML)); saveLib(); updateStatus();
+}
+function renderSidePick() {
+  const b = book(); if (!b) return;
+  $("#bnPick").innerHTML = b.notes.filter(n => n.id !== cur.page || n.id === side.noteId).map(n => `<option value="${esc(n.id)}"${n.id === side.noteId ? " selected" : ""}>${esc(n.title || "Untitled page")}</option>`).join("");
+  $("#bnPick").hidden = !b.notes.length; $("#bnFull").hidden = !side.noteId;
+}
+let sideLoad = 0;
+async function openNoteBeside(id) {
+  const b = book(); if (!b) return;
+  flushSideNote();
+  if (id && b.notes.some(n => n.id === id)) { if (cur.page === id) await openPage("ms"); } // the same page is never open twice
+  else { const last = side.last[b.id]; id = last && last !== cur.page && b.notes.some(n => n.id === last) ? last : (b.notes.find(n => n.id !== cur.page) || {}).id; }
+  showSideTab("notes");
+  side.noteId = id || null;
+  const has = !!side.noteId;
+  $("#bnEmpty").hidden = has; $("#bnTitle").hidden = !has; $("#bnEd").hidden = !has;
+  renderSidePick();
+  if (!has) return;
+  side.last[b.id] = id;
+  const meta = b.notes.find(n => n.id === id), my = ++sideLoad;
+  $("#bnTitle").value = meta.title || ""; $("#bnEd").innerHTML = ""; $("#bnEd").contentEditable = "false";
+  let html; try { html = (await loadNote(id)).html; } catch (e) { if (my === sideLoad) $("#bnEd").textContent = e.message || "This page couldn't be opened."; return; }
+  if (my !== sideLoad || side.noteId !== id) return;
+  $("#bnEd").innerHTML = sanitize(html) || "<p><br></p>";
+  $("#bnEd").contentEditable = edit.ro ? "false" : "true";
+  $(".bn-wrap").scrollTop = 0;
+  if (!meta.title) $("#bnTitle").focus();
+}
+async function newNotePage(tpl) {
+  const b = book(); if (!b) return;
+  const t = TPL[tpl], n = {id:uid(), title:t ? t[0] : ""};
+  writeNote(n.id, t ? t[1].map(h => `<p><strong>${esc(h)}</strong></p><p><br></p>`).join("") : "<p></p>");
+  b.notes.push(n); b.notesOpen = true; saveLib(); renderNotes();
+  if (cur.page === "ms" || !$("#beside").hidden && side.tab === "notes") await openNoteBeside(n.id); else await openPage(n.id);
+  const ti = !$("#beside").hidden && side.noteId === n.id ? $("#bnTitle") : $("#noteTitle"); ti.focus(); ti.select();
+}
+$("#beside").addEventListener("click", e => {
+  const t = e.target.closest("[data-bt]"), tp = e.target.closest("[data-bntpl]");
+  if (t) { if (t.dataset.bt === "notes") openNoteBeside(side.noteId); else openBeside(beside.id); }
+  if (tp) newNotePage(tp.dataset.bntpl);
+});
+$("#bnPick").addEventListener("change", e => openNoteBeside(e.target.value));
+$("#bnFull").addEventListener("click", () => { const id = side.noteId; if (!id) return; closeBeside(); openPage(id); });
+$("#bnNew").addEventListener("click", e => { e.stopPropagation(); const m = $("#npMenu"), r = e.currentTarget.getBoundingClientRect(); m.style.left = Math.max(8, Math.min(innerWidth - 220, r.left)) + "px"; m.style.top = (r.bottom + 6) + "px"; m.hidden = !m.hidden; });
+$("#bnEd").addEventListener("input", () => { if (!side.noteId || edit.ro) return; side.dirty = true; clearTimeout(side.t); side.t = setTimeout(flushSideNote, 700); });
+$("#bnEd").addEventListener("blur", flushSideNote);
+$("#bnTitle").addEventListener("input", () => {
+  const b = book(), meta = b && b.notes.find(n => n.id === side.noteId); if (!meta) return;
+  meta.title = $("#bnTitle").value;
+  const row = $(`#notes li[data-note="${meta.id}"] .tt`); if (row) { row.textContent = meta.title || "Untitled page"; row.classList.toggle("dim", !meta.title); }
+  const o = $(`#bnPick option[value="${meta.id}"]`); if (o) o.textContent = meta.title || "Untitled page";
+  clearTimeout(titleT); titleT = setTimeout(saveLib, 800);
+});
+$("#bnTitle").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); const el = $("#bnEd"); el.focus(); try { const r = document.createRange(); r.selectNodeContents(el.firstElementChild || el); r.collapse(true); getSelection().removeAllRanges(); getSelection().addRange(r); } catch {} } });
+$("#nbBtn").addEventListener("click", () => { if (!$("#beside").hidden && side.tab === "notes") closeBeside(); else openNoteBeside(side.noteId); });
+document.addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "o" && view === "desk") { e.preventDefault(); $("#nbBtn").click(); } });
+addEventListener("pagehide", flushSideNote);
+document.addEventListener("visibilitychange", () => { if (document.hidden) flushSideNote(); });
 
 /* ---------- Keyboard shortcuts ---------- */
 function openKeys() {
