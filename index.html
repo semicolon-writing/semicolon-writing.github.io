@@ -3969,6 +3969,32 @@ document.addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.sh
 addEventListener("pagehide", flushSideNote);
 document.addEventListener("visibilitychange", () => { if (document.hidden) flushSideNote(); });
 
+/* ---------- Copy and cut: paste cleanly into Google Docs, Word, email ---------- */
+function cleanCopy(e, root, cut) {
+  const sel = getSelection(); if (!sel.rangeCount || sel.isCollapsed) return;
+  const r = sel.getRangeAt(0); if (!root.contains(r.commonAncestorContainer)) return;
+  const d = document.createElement("div"); d.appendChild(r.cloneContents());
+  const scene = (book() && styleOf(book()).scene) || "* * *";
+  d.querySelectorAll("h2").forEach(h => {
+    const lab = h.getAttribute("data-display") || "", t = h.textContent.trim(), n = document.createElement("h2");
+    n.textContent = lab && t ? `${lab}: ${t}` : (lab || t); h.replaceWith(n);
+  });
+  d.querySelectorAll("hr").forEach(h => { const p = document.createElement("p"); p.setAttribute("style", "text-align:center"); p.textContent = scene; h.replaceWith(p); });
+  d.querySelectorAll("mark, span, font").forEach(m => m.replaceWith(...m.childNodes));
+  d.querySelectorAll("*").forEach(x => { for (const a of [...x.attributes]) if (!(x.tagName === "P" && a.name === "style")) x.removeAttribute(a.name); });
+  const blocks = d.querySelectorAll(":scope > p, :scope > h2, :scope > blockquote, :scope > div");
+  const text = blocks.length ? [...d.childNodes].map(n => n.textContent).filter((t, i, a) => t.trim() || i < a.length - 1).join("\n") : d.textContent;
+  e.clipboardData.setData("text/html", d.innerHTML);
+  e.clipboardData.setData("text/plain", text.replace(/ /g, " "));
+  e.preventDefault();
+  if (cut && root.isContentEditable) document.execCommand("delete");
+}
+ed.addEventListener("copy", e => cleanCopy(e, ed, false));
+ed.addEventListener("cut", e => cleanCopy(e, ed, true));
+$("#bnEd").addEventListener("copy", e => cleanCopy(e, $("#bnEd"), false));
+$("#bnEd").addEventListener("cut", e => cleanCopy(e, $("#bnEd"), true));
+$("#bsBody").addEventListener("copy", e => cleanCopy(e, $("#bsBody"), false));
+
 /* ---------- Keyboard shortcuts ---------- */
 function openKeys() {
   const M = IS_MAC ? "⌘" : "Ctrl", SH = IS_MAC ? "⇧" : "Shift", kb = (...k) => k.map(x => `<kbd>${x}</kbd>`).join(" ");
