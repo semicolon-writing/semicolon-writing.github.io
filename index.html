@@ -3981,9 +3981,17 @@ function cleanCopy(e, root, cut) {
     const lab = h.getAttribute("data-display") || "", t = h.textContent.trim(), n = document.createElement("h2");
     n.textContent = lab && t ? `${lab}: ${t}` : (lab || t); h.replaceWith(n);
   });
+  const st = book() && styleOf(book());
+  if (st && st.dropCap && root === ed) d.querySelectorAll("h2 + p").forEach(p => {
+    const w = document.createTreeWalker(p, NodeFilter.SHOW_TEXT); let t; while ((t = w.nextNode()) && !t.textContent.trim());
+    const m = t && t.textContent.match(/^\s*[\p{P}]*[\p{L}\p{N}]|^\s*\S/u); if (!m) return;
+    t.textContent = t.textContent.slice(m[0].length);
+    const big = document.createElement("span"); big.dataset.cap = "1"; big.setAttribute("style", `font-size:3em;line-height:1;font-family:${fontStack(capFontOf({head:st.headFont, body:st.bodyFont}))};color:#6b5a43`); big.textContent = m[0].trim();
+    t.parentNode.insertBefore(big, t);
+  });
   d.querySelectorAll("hr").forEach(h => { const p = document.createElement("p"); p.setAttribute("style", "text-align:center"); p.textContent = scene; h.replaceWith(p); });
-  d.querySelectorAll("mark, span, font").forEach(m => m.replaceWith(...m.childNodes));
-  d.querySelectorAll("*").forEach(x => { for (const a of [...x.attributes]) if (!(x.tagName === "P" && a.name === "style")) x.removeAttribute(a.name); });
+  d.querySelectorAll("mark, span:not([data-cap]), font").forEach(m => m.replaceWith(...m.childNodes));
+  d.querySelectorAll("*").forEach(x => { const keep = x.tagName === "P" || !!x.dataset.cap; for (const a of [...x.attributes]) if (!(keep && a.name === "style")) x.removeAttribute(a.name); });
   const blocks = d.querySelectorAll(":scope > p, :scope > h2, :scope > blockquote, :scope > div");
   const text = blocks.length ? [...d.childNodes].map(n => n.textContent).filter((t, i, a) => t.trim() || i < a.length - 1).join("\n") : d.textContent;
   e.clipboardData.setData("text/html", d.innerHTML);
@@ -4709,7 +4717,7 @@ h1,h2{font-family:${fontStack(s.headFont)};text-align:${s.headAlign};font-weight
 h2{font-size:${s.headSize}em;${hc}${s.headItalic ? "font-style:italic;" : ""}margin:3em 0 1.5em;page-break-before:always}.num{display:block;font-size:.38em;letter-spacing:.22em;text-transform:uppercase;color:#777;font-variant:normal;margin-bottom:.6em}
 p{margin:${s.para === "space" ? "0 0 .85em" : "0"};${s.para === "indent" ? "text-indent:1.5em" : ""}}h2+p,hr+p,blockquote p,body>p:first-of-type{text-indent:0}
 hr{border:0;text-align:center;margin:1.2em 0}hr::after{content:${JSON.stringify(s.scene)};letter-spacing:.35em;color:#777}
-blockquote{margin:1.1em 1.4em;padding:.2em 1em;border-left:2px solid #999;font-style:italic}${s.orn ? `h2::after{content:${JSON.stringify(s.orn)};display:block;font-family:${fontStack(s.bodyFont)};font-size:.4em;letter-spacing:.4em;color:#8a7a60;margin-top:.7em;text-transform:none;font-variant:normal}` : ""}</style></head><body>
+blockquote{margin:1.1em 1.4em;padding:.2em 1em;border-left:2px solid #999;font-style:italic}${s.dropCap ? `body>h1+p::first-letter,h2+p::first-letter{float:left;font-family:${fontStack(capFontOf({head:s.headFont, body:s.bodyFont}))};font-size:3.5em;line-height:.82;padding:.06em .08em 0 0;color:#6b5a43;font-style:normal}body>h1+p,h2+p{display:flow-root}` : ""}${s.orn ? `h2::after{content:${JSON.stringify(s.orn)};display:block;font-family:${fontStack(s.bodyFont)};font-size:.4em;letter-spacing:.4em;color:#8a7a60;margin-top:.7em;text-transform:none;font-variant:normal}` : ""}</style></head><body>
 <h1>${esc(b.title)}</h1>${b.sub ? `<p style="text-align:center;text-indent:0">${esc(b.sub)}</p>` : ""}
 ${d.innerHTML}
 </body></html>`;
@@ -4746,19 +4754,27 @@ function buildDocx(b, d, s) { // d: the manuscript, with chapter labels already 
   const run = (text, f = {}) => text ? `<w:r>${f.b || f.i ? `<w:rPr>${f.b ? "<w:b/>" : ""}${f.i ? "<w:i/>" : ""}</w:rPr>` : ""}<w:t xml:space="preserve">${x(text)}</w:t></w:r>` : "";
   const runs = (node, f = {}) => Array.from(node.childNodes).map(k => k.nodeType === 3 ? run(k.textContent, f) : k.nodeType !== 1 ? "" : k.tagName === "BR" ? (k.nextSibling ? "<w:r><w:br/></w:r>" : "") : k.tagName === "EM" ? runs(k, {...f, i:true}) : k.tagName === "STRONG" ? runs(k, {...f, b:true}) : runs(k, f)).join("");
   const P = (style, inner) => `<w:p><w:pPr><w:pStyle w:val="${style}"/></w:pPr>${inner}</w:p>`;
-  let body = P("Title", run(b.title)) + (b.sub ? P("Subtitle", run(b.sub)) : ""), first = true;
+  const font = f => `<w:rFonts w:ascii="${x(f)}" w:hAnsi="${x(f)}" w:cs="${x(f)}" w:eastAsia="${x(f)}"/>`;
+  let body = P("Title", run(b.title)) + (b.sub ? P("Subtitle", run(b.sub)) : ""), first = true, capNext = true;
+  const capFont = capFontOf({head:s.headFont, body:s.bodyFont});
+  const capRuns = n => { // the big first letter: its own run, so Word and Google Docs both keep it
+    const c = n.cloneNode(true), w = document.createTreeWalker(c, NodeFilter.SHOW_TEXT);
+    let t; while ((t = w.nextNode()) && !t.textContent.trim());
+    const m = t && t.textContent.match(/^\s*[\p{P}]*[\p{L}\p{N}]|^\s*\S/u); if (!m) return runs(n);
+    t.textContent = t.textContent.slice(m[0].length);
+    return `<w:r><w:rPr>${font(capFont)}<w:color w:val="6B5A43"/><w:sz w:val="76"/><w:szCs w:val="76"/></w:rPr><w:t xml:space="preserve">${x(m[0].trim())}</w:t></w:r>` + runs(c);
+  };
   for (const n of Array.from(d.children)) {
     if (isChap(n)) {
       const lab = n.dataset.display || "", t = n.textContent.trim();
       const orn = s.orn;
       body += P("Heading1", (lab ? `<w:r><w:rPr><w:rStyle w:val="ChapLabel"/></w:rPr><w:t xml:space="preserve">${x(lab)}</w:t></w:r>${t ? "<w:r><w:br/></w:r>" : ""}` : "") + run(t) || "") + (orn ? P("Ornament", run(orn)) : "");
-      first = true; continue;
+      first = true; capNext = true; continue;
     }
-    if (n.tagName === "HR") { body += P("Scene", run(s.scene)); first = true; continue; }
-    if (n.tagName === "BLOCKQUOTE") { for (const p of Array.from(n.children)) body += P("Letter", runs(p)); first = true; continue; }
-    body += P(first ? "FirstPara" : "Normal", runs(n)); first = false;
+    if (n.tagName === "HR") { body += P("Scene", run(s.scene)); first = true; capNext = false; continue; }
+    if (n.tagName === "BLOCKQUOTE") { for (const p of Array.from(n.children)) body += P("Letter", runs(p)); first = true; capNext = false; continue; }
+    body += P(first ? "FirstPara" : "Normal", s.dropCap && capNext ? capRuns(n) : runs(n)); first = false; capNext = false;
   }
-  const font = f => `<w:rFonts w:ascii="${x(f)}" w:hAnsi="${x(f)}" w:cs="${x(f)}" w:eastAsia="${x(f)}"/>`;
   const line = Math.round(Math.min(2, Math.max(1, s.lineHeight)) * 240), hsz = Math.round(24 * Math.min(2.2, Math.max(1.3, s.headSize)));
   const caps = s.headCase === "upper" ? "<w:caps/>" : s.headCase === "smallcaps" ? "<w:smallCaps/>" : "";
   const W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"', XH = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
