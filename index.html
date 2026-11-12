@@ -3985,7 +3985,7 @@ function cleanCopy(e, root, cut) {
   if (st && st.dropCap && root === ed) d.querySelectorAll("h2 + p").forEach(p => {
     const w = document.createTreeWalker(p, NodeFilter.SHOW_TEXT); let t; while ((t = w.nextNode()) && !t.textContent.trim());
     const m = t && t.textContent.match(/^\s*[\p{P}]*[\p{L}\p{N}]|^\s*\S/u); if (!m) return;
-    t.textContent = t.textContent.slice(m[0].length);
+    t.textContent = t.textContent.slice(m[0].length).replace(/^\s+/, "\u00a0"); // Google Docs drops a plain space right after the big letter
     const big = document.createElement("span"); big.dataset.cap = "1"; big.setAttribute("style", `font-size:3em;line-height:1;font-family:${fontStack(capFontOf({head:st.headFont, body:st.bodyFont}))};color:#6b5a43`); big.textContent = m[0].trim();
     t.parentNode.insertBefore(big, t);
   });
