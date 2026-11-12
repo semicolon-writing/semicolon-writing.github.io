@@ -1086,6 +1086,7 @@ button.prof:hover{background:var(--raise)}
         <button class="tb ms-only" data-cmd="scene" title="Scene break (Ctrl+Enter)">Scene<span class="lg"> break</span> <span class="k" id="sceneGlyphHint">* * *</span></button>
         <button class="tb" data-cmd="note" title="A letter, note or message inside the story">Letter</button>
         <button class="tb" id="nbBtn" title="Open your notebook beside your writing (Ctrl+Shift+O)">Notebook</button>
+        <button class="tb" id="draftsBtn" title="Start a new draft, read old drafts, or compare two">Drafts</button>
         <button class="tb" id="mnoteBtn" title="Pin a private note to the words you've selected (Ctrl+Shift+M)">✎<span class="lg"> Note</span></button>
         <button class="tb icon touch-only" data-fmt2="bold" title="Bold" aria-label="Bold"><b>B</b></button>
         <button class="tb icon touch-only" data-fmt2="italic" title="Italic" aria-label="Italic"><i style="font-family:Georgia,serif">I</i></button>
@@ -3964,6 +3965,7 @@ $("#bnTitle").addEventListener("input", () => {
   clearTimeout(titleT); titleT = setTimeout(saveLib, 800);
 });
 $("#bnTitle").addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); const el = $("#bnEd"); el.focus(); try { const r = document.createRange(); r.selectNodeContents(el.firstElementChild || el); r.collapse(true); getSelection().removeAllRanges(); getSelection().addRange(r); } catch {} } });
+$("#draftsBtn").addEventListener("click", () => $("#historyBtn").click());
 $("#nbBtn").addEventListener("click", () => { if (!$("#beside").hidden && side.tab === "notes") closeBeside(); else openNoteBeside(side.noteId); });
 document.addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "o" && view === "desk") { e.preventDefault(); $("#nbBtn").click(); } });
 addEventListener("pagehide", flushSideNote);
