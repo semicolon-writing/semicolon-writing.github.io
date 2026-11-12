@@ -3972,9 +3972,23 @@ addEventListener("pagehide", flushSideNote);
 document.addEventListener("visibilitychange", () => { if (document.hidden) flushSideNote(); });
 
 /* ---------- Copy and cut: paste cleanly into Google Docs, Word, email ---------- */
+/* The big first letter: browsers put the cursor after it, so selections and Home quietly skip it */
+const CAP_RE = /^\s*[\p{P}]*[\p{L}\p{N}]|^\s*\S/u;
+function capPara(node) {
+  if (!$(".page").classList.contains("dropcap")) return null;
+  const el = node && (node.nodeType === 1 ? node : node.parentNode), p = el && el.closest && el.closest("#ed > p");
+  if (!p || !(p === ed.firstElementChild || (p.previousElementSibling && isChap(p.previousElementSibling)))) return null;
+  return p;
+}
+function offsetIn(p, node, off) { const r = document.createRange(); r.setStart(p, 0); try { r.setEnd(node, off); } catch { return -1; } return r.toString().length; }
+function capLen(p) { const t = p.textContent, m = t.match(CAP_RE); return m ? m[0].length + (t.slice(m[0].length).match(/^\s*/) || [""])[0].length : 0; } // the letter and any space after it
 function cleanCopy(e, root, cut) {
   const sel = getSelection(); if (!sel.rangeCount || sel.isCollapsed) return;
-  const r = sel.getRangeAt(0); if (!root.contains(r.commonAncestorContainer)) return;
+  let r = sel.getRangeAt(0); if (!root.contains(r.commonAncestorContainer)) return;
+  if (root === ed) { // a selection that starts right after the big letter means the whole line: take the letter too
+    const cp = capPara(r.startContainer), at = cp ? offsetIn(cp, r.startContainer, r.startOffset) : -1;
+    if (cp && at > 0 && at <= capLen(cp)) { r = r.cloneRange(); r.setStart(cp, 0); if (cut) { sel.removeAllRanges(); sel.addRange(r); } }
+  }
   const d = document.createElement("div"); d.appendChild(r.cloneContents());
   const scene = (book() && styleOf(book()).scene) || "* * *";
   d.querySelectorAll("h2").forEach(h => {
@@ -4000,6 +4014,18 @@ function cleanCopy(e, root, cut) {
   if (cut && root.isContentEditable) document.execCommand("delete");
 }
 ed.addEventListener("copy", e => cleanCopy(e, ed, false));
+ed.addEventListener("keydown", e => {
+  if (e.key !== "Home" || e.ctrlKey || e.metaKey || e.altKey) return;
+  setTimeout(() => { // after the browser moves, step back over the big letter if it stopped just after it
+    const sel = getSelection(); if (!sel.rangeCount) return;
+    const cp = capPara(sel.focusNode); if (!cp) return;
+    const at = offsetIn(cp, sel.focusNode, sel.focusOffset);
+    if (at > 0 && at <= capLen(cp)) {
+      const w = document.createTreeWalker(cp, NodeFilter.SHOW_TEXT), t = w.nextNode(), [n, o] = t ? [t, 0] : [cp, 0];
+      if (e.shiftKey) sel.extend(n, o); else sel.collapse(n, o);
+    }
+  }, 0);
+});
 ed.addEventListener("cut", e => cleanCopy(e, ed, true));
 $("#bnEd").addEventListener("copy", e => cleanCopy(e, $("#bnEd"), false));
 $("#bnEd").addEventListener("cut", e => cleanCopy(e, $("#bnEd"), true));
