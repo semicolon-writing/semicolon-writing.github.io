@@ -796,7 +796,8 @@ body.typing .ed mark.nt{background:transparent;border-bottom-color:color-mix(in 
 .side{background:color-mix(in srgb,var(--ink) 2.5%,var(--desk))}
 .side-foot{gap:0;padding:10px 6px 0;flex-wrap:nowrap}
 .side-foot .btn{padding:6px 5px;font-size:12px}
-.toolbar{flex-wrap:nowrap}
+.toolbar{flex-wrap:wrap;row-gap:2px}
+@media (max-width:720px){.toolbar{flex-wrap:nowrap}}
 .page{box-shadow:var(--page-shadow)}
 
 /* Modals and lists added for profiles, trash and recovery */
