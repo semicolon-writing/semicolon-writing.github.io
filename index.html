@@ -883,6 +883,7 @@ button.prof:hover{background:var(--raise)}
 .dr-list .when small{color:var(--ink-3);font-size:12.5px;display:block}
 .dr-list .when em{font-style:normal;color:var(--ink-2);font-size:12.5px;display:block}
 .dr-list .btn{padding:6px 12px;font-size:13px}
+.linkbtn{border:0;background:none;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}
 .dr-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
 .dr-top p{flex:1;min-width:200px;margin:0}
 .df-opts{display:flex;flex-direction:column;gap:6px}
@@ -1954,7 +1955,11 @@ function mergeLibraries(local, remote) {
     else {
       if ((b.msV || 0) > (existing.msV || 0)) { existing.parts = b.parts || 0; existing.msV = b.msV; }
       const vs = new Map([...(b.versions || []), ...(existing.versions || [])].map(v => [v.id, v]));
-      existing.versions = [...vs.values()].sort((a, b) => b.at - a.at).slice(0, VER_MAX);
+      const allV = [...vs.values()].sort((a, b) => b.at - a.at); // drafts are kept for good; only automatic versions are capped
+      existing.versions = [...allV.filter(v => v.why === "draft"), ...allV.filter(v => v.why !== "draft").slice(0, VER_MAX)].sort((a, b) => b.at - a.at);
+      const dl = new Map([...(b.draftLog || []), ...(existing.draftLog || [])].map(v => [v.id, v]));
+      if (dl.size) existing.draftLog = [...dl.values()];
+      existing.draftNo = Math.max(b.draftNo || 1, existing.draftNo || 1);
       const ns = new Map([...(b.notes || []), ...(existing.notes || [])].map(n => [n.id, n]));
       existing.goneNotes = [...new Set([...(existing.goneNotes || []), ...(b.goneNotes || [])])];
       existing.notes = [...ns.values()].filter(n => !existing.goneNotes.includes(n.id));
@@ -1995,6 +2000,7 @@ async function reconcileLocalCopies() {
       try { const html = await getVersionData(v); v.store = "db"; v.parts = await putVersionData(v,html); saveLib(); }
       catch { v.store = "idb"; }
     }
+    for (const d of b.draftLog || []) { const v = (b.versions || []).find(x => x.id === d.id); if (v) { d.store = v.store; d.parts = v.parts; } }
   }
 }
 async function attachStore(col) {
@@ -3489,8 +3495,20 @@ async function getVersionData(v) {
     }
   }
   let h; try { h = await idbDo("readonly", st => st.get(v.id)); } catch {}
+  if (h == null && S.mode === "db") { const c = await loadVerCloud(v.id); if (c != null) return c; }
   if (h == null) throw new Error("This version was saved in a different browser.");
   return unseal(h);
+}
+async function loadVerCloud(id, parts) { // every part of a saved version from the account, or null
+  const out = [];
+  for (let i = 0; i < (parts || 60); i++) {
+    const sn = await S.col.doc(`ver_${id}_${i}`).get();
+    if (!sn.exists) break;
+    out.push(sn.data().html || "");
+  }
+  if (!out.length) return null;
+  try { const html = out.map(x => unseal(x)).join(""); try { await idbDo("readwrite", st => st.put(seal(html), id)); } catch {} return html; }
+  catch { return null; }
 }
 function dropVersionData(v) {
   verCache.delete(v.id);
@@ -3596,7 +3614,7 @@ $("#verSave").addEventListener("click", async () => {
 });
 $("#verBody").addEventListener("click", async e => {
   const b = book(); if (!b) return;
-  const find1 = id => (b.versions || []).find(v => v.id === id);
+  const find1 = id => draftById(b, id);
   const p = e.target.closest("[data-vp]"), r = e.target.closest("[data-vr]"), dl = e.target.closest("[data-vdl]");
   if (e.target.closest("[data-vback]")) { if (verBackTo === "dr") { verBackTo = null; renderDrafts(); return historyTab("dr"); } return renderVersions(); }
   if (p) return previewVersion(find1(p.dataset.vp));
@@ -3606,7 +3624,14 @@ $("#verBody").addEventListener("click", async e => {
 
 /* ---------- Drafts: keep a finished draft, write the next one over it, compare any two ---------- */
 let verBackTo = null;
-const draftsOf = b => ((b && b.versions) || []).filter(v => v.why === "draft").sort((x, y) => (x.draft || 0) - (y.draft || 0));
+function draftsOf(b) {
+  if (!b) return [];
+  const m = new Map((b.draftLog || []).map(v => [v.id, v]));
+  for (const v of b.versions || []) if (v.why === "draft") m.set(v.id, v);
+  return [...m.values()].sort((x, y) => (x.draft || 0) - (y.draft || 0) || x.at - y.at);
+}
+const draftById = (b, id) => draftsOf(b).find(v => v.id === id) || ((b && b.versions) || []).find(v => v.id === id);
+function recordDraft(b, v) { b.draftLog = (b.draftLog || []).filter(x => x.id !== v.id); b.draftLog.push({id:v.id, at:v.at, words:v.words, why:"draft", draft:v.draft, name:v.name, note:v.note || "", store:v.store, parts:v.parts}); }
 function renderDrafts() {
   const b = book(); if (!b) return;
   const n = b.draftNo || 1, ds = draftsOf(b);
@@ -3615,11 +3640,12 @@ function renderDrafts() {
     <button class="btn primary" id="drNew">Start Draft ${n + 1}</button>${ds.length ? `<button class="btn" data-dcmp="">Compare…</button>` : ""}</div>
     <ul class="dr-list"><li class="now"><div class="when"><b>Draft ${n}</b><small>Writing now · ${fmt(b.words || 0)} words</small></div></li>
     ${ds.slice().reverse().map(v => `<li><div class="when"><b>${esc(v.name || "Draft " + v.draft)}</b><small>Finished ${esc(relTime(v.at).replace(/^Today/, "today").replace(/^Yesterday/, "yesterday"))} · ${fmt(v.words)} words</small>${v.note ? `<em>${esc(v.note)}</em>` : ""}</div>
-      <button class="btn ghost" data-dread="${esc(v.id)}">Read</button><button class="btn ghost" data-dbes="${esc(v.id)}">Open beside</button><button class="btn" data-dcmp="${esc(v.id)}">Compare with now</button></li>`).join("")}</ul>`;
+      <button class="btn ghost" data-dread="${esc(v.id)}">Read</button><button class="btn ghost" data-dbes="${esc(v.id)}">Open beside</button><button class="btn" data-dcmp="${esc(v.id)}">Compare with now</button></li>`).join("")}</ul>
+    <p class="sub" style="margin:12px 0 0">Missing a draft? <button type="button" class="linkbtn" id="drLost">Find it</button></p>`;
 }
 $("#drBody").addEventListener("click", e => {
   const b = book(); if (!b) return;
-  const find1 = id => (b.versions || []).find(v => v.id === id);
+  const find1 = id => draftById(b, id);
   const r = e.target.closest("[data-dread]"), bs = e.target.closest("[data-dbes]"), c = e.target.closest("[data-dcmp]");
   if (e.target.closest("#drNew")) return openNewDraft();
   if (r) { verBackTo = "dr"; historyTab("ver"); return previewVersion(find1(r.dataset.dread)); }
@@ -3656,7 +3682,7 @@ async function startNewDraft(mode, note, beside) {
   if (!v || !b) { $("#draftModal").hidden = true; return toast("The draft couldn't be kept, so nothing was changed. Try again, or download a backup first.", 7000); }
   const n = b.draftNo || 1;
   v.draft = n; v.name = `Draft ${n}`; if (note) v.note = note;
-  b.draftNo = n + 1; saveLib();
+  recordDraft(b, v); b.draftNo = n + 1; saveLib();
   if (mode !== "copy") {
     let next = "<p><br></p>";
     if (mode === "chapters") {
@@ -3825,7 +3851,7 @@ function openCompare(a, b2) {
 }
 async function cmpHTML(b, id) {
   if (id === "now") return currentMs(b);
-  const v = (b.versions || []).find(x => x.id === id); if (!v) throw new Error("That draft couldn't be found.");
+  const v = draftById(b, id); if (!v) throw new Error("That draft couldn't be found.");
   return getVersionData(v);
 }
 let cmpRun = 0;
@@ -4030,6 +4056,85 @@ ed.addEventListener("cut", e => cleanCopy(e, ed, true));
 $("#bnEd").addEventListener("copy", e => cleanCopy(e, $("#bnEd"), false));
 $("#bnEd").addEventListener("cut", e => cleanCopy(e, $("#bnEd"), true));
 $("#bsBody").addEventListener("copy", e => cleanCopy(e, $("#bsBody"), false));
+
+/* ---------- Find a missing draft: saved versions whose label was lost ---------- */
+async function lostVersions() {
+  const known = new Set();
+  for (const b of lib.books) { for (const v of b.versions || []) known.add(v.id); for (const v of b.draftLog || []) known.add(v.id); }
+  for (const t of trashItems()) for (const v of (t.meta && t.meta.versions) || []) known.add(v.id);
+  const found = new Map();
+  if (S.mode === "db") {
+    try {
+      const rows = (await sbRest("GET", "?select=key,updated_at&key=like." + encodeURIComponent("ver_*"))) || [];
+      for (const r of rows) { const m = /^ver_(.+)_(\d+)$/.exec(r.key); if (!m || known.has(m[1])) continue;
+        const f = found.get(m[1]) || {id:m[1], parts:0, at:0, cloud:true}; f.parts = Math.max(f.parts, +m[2] + 1);
+        if (+m[2] === 0) f.at = Date.parse(r.updated_at) || 0; found.set(m[1], f); }
+    } catch {}
+  }
+  try { const ids = (await idbDo("readonly", st => st.getAllKeys())) || []; for (const id of ids) if (!known.has(id) && !found.has(id)) found.set(id, {id, parts:1, at:0, cloud:false}); } catch {}
+  return [...found.values()].sort((a, b) => b.at - a.at);
+}
+async function lostText(f) {
+  let h; try { h = await idbDo("readonly", st => st.get(f.id)); } catch {}
+  if (h != null) { try { return unseal(h); } catch { return null; } }
+  return f.cloud && S.mode === "db" ? loadVerCloud(f.id, f.parts) : null;
+}
+const lost = {list:null, shown:0, text:new Map()};
+async function showLostDrafts() {
+  const b = book(); if (!b) return;
+  $("#verSave").hidden = true;
+  $("#drBody").innerHTML = `<p class="sub" style="margin:0 0 10px">Looking through everything saved for you…</p>`;
+  lost.list = await lostVersions(); lost.shown = 0; lost.text = new Map();
+  if (!lost.list.length) { $("#drBody").innerHTML = `<p class="sub">Nothing missing was found${S.mode === "db" ? "" : " on this computer. If you use an account, sign in and look again"}.</p><div class="actions"><button class="btn" data-lback>← All drafts</button></div>`; return; }
+  $("#drBody").innerHTML = `<p class="sub" style="margin:0 0 10px">These are saved copies that aren't in any list. Newest first. Find the one that's your missing draft and put it back. Nothing here is changed until you do.</p><ul class="dr-list" id="lostList"></ul><div class="actions"><button class="btn" data-lback>← All drafts</button><div class="r"><button class="btn" id="lostMore">Show more</button></div></div>`;
+  moreLost();
+}
+async function moreLost() {
+  const b = book(), ul = $("#lostList"); if (!b || !ul) return;
+  const next = lost.list.slice(lost.shown, lost.shown + 15); lost.shown += next.length;
+  $("#lostMore").hidden = lost.shown >= lost.list.length;
+  for (const f of next) {
+    const li = document.createElement("li"); li.innerHTML = `<div class="when"><b>${f.at ? esc(relTime(f.at)) : "Date unknown"}</b><small>Opening…</small></div>`; ul.appendChild(li);
+    const html = await lostText(f);
+    if (html == null) { li.querySelector("small").textContent = "Can't be opened here (it may need the lock from another computer)."; continue; }
+    lost.text.set(f.id, html);
+    const d = document.createElement("div"); d.innerHTML = sanitize(html);
+    const words = countWords(Array.from(d.children).filter(n => !isChap(n)).map(n => n.textContent).join(" "));
+    const first = (Array.from(d.children).find(n => !isChap(n) && n.textContent.trim()) || d).textContent.trim().split(/\s+/).slice(0, 14).join(" ");
+    const chaps = d.querySelectorAll(":scope > h2.chap").length;
+    f.words = words;
+    li.innerHTML = `<div class="when"><b>${f.at ? esc(relTime(f.at)) : "Date unknown"}</b><small>${fmt(words)} words${chaps ? ` · ${chaps} chapter${chaps === 1 ? "" : "s"}` : ""}</small><em>${esc(first)}${first ? "…" : ""}</em></div><button class="btn ghost" data-lread="${esc(f.id)}">Read</button><button class="btn" data-lput="${esc(f.id)}">Put back as a draft</button>`;
+  }
+}
+function lostPreview(id) {
+  const b = book(), html = lost.text.get(id); if (!b || html == null) return;
+  const d = document.createElement("div"); d.innerHTML = sanitize(html);
+  const st = styleOf(b), c = {ch:0, part:0};
+  d.querySelectorAll(":scope > h2.chap").forEach(h => { const lab = labelFor(h, st, c), t = h.textContent.trim(); h.textContent = [lab, t].filter(Boolean).join(": ") || "Chapter"; h.removeAttribute("class"); });
+  d.querySelectorAll("mark").forEach(m => m.replaceWith(...m.childNodes));
+  $("#drBody").innerHTML = `<div class="ver-prev">${d.innerHTML}</div><div class="actions"><button class="btn" data-lback2>← Back to the list</button><div class="r"><button class="btn primary" data-lput="${esc(id)}">Put back as a draft</button></div></div>`;
+}
+function putBackLost(id) {
+  const b = book(), f = (lost.list || []).find(x => x.id === id); if (!b || !f) return;
+  if (draftsOf(b).some(v => v.id === id)) return toast("That one is already in your drafts.");
+  const used = new Set(draftsOf(b).map(v => v.draft)), n = b.draftNo || 1;
+  let k = 1; while (used.has(k) && k < n) k++;
+  const free = k < n && !used.has(k);
+  const v = {id, at:f.at || Date.now(), words:f.words || 0, why:"draft", draft:free ? k : 0, name:free ? `Draft ${k}` : "Recovered draft", note:"Put back", store:f.cloud ? "db" : "idb", parts:f.parts || 1};
+  b.versions = b.versions || []; b.versions.push(v); b.versions.sort((x, y) => y.at - x.at);
+  recordDraft(b, v); saveLib();
+  toast(`${v.name} is back in Drafts.`, 6000);
+  renderDrafts();
+}
+$("#drBody").addEventListener("click", e => {
+  if (e.target.closest("#drLost")) return showLostDrafts();
+  if (e.target.closest("#lostMore")) return moreLost();
+  if (e.target.closest("[data-lback]")) return renderDrafts();
+  if (e.target.closest("[data-lback2]")) { const b = book(); if (!b) return; $("#drBody").innerHTML = `<p class="sub" style="margin:0 0 10px">These are saved copies that aren't in any list. Newest first.</p><ul class="dr-list" id="lostList"></ul><div class="actions"><button class="btn" data-lback>← All drafts</button><div class="r"><button class="btn" id="lostMore">Show more</button></div></div>`; const keep = lost.shown; lost.shown = 0; (async () => { while (lost.shown < keep) await moreLost(); })(); return; }
+  const r = e.target.closest("[data-lread]"), pb = e.target.closest("[data-lput]");
+  if (r) return lostPreview(r.dataset.lread);
+  if (pb) return putBackLost(pb.dataset.lput);
+});
 
 /* ---------- Keyboard shortcuts ---------- */
 function openKeys() {
