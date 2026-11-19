@@ -883,6 +883,12 @@ button.prof:hover{background:var(--raise)}
 .dr-list .when small{color:var(--ink-3);font-size:12.5px;display:block}
 .dr-list .when em{font-style:normal;color:var(--ink-2);font-size:12.5px;display:block}
 .dr-list .btn{padding:6px 12px;font-size:13px}
+.wordopts{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.wordopts label{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;cursor:pointer}
+.wordopts input{margin-top:3px;accent-color:var(--accent)}
+.wordopts label b{display:block;font-weight:600}
+#exportModal .fields .btn{white-space:normal;text-align:left;justify-content:flex-start;height:auto;line-height:1.35;padding:10px 14px}
+.wordopts small{color:var(--ink-3);font-size:12.5px}
 .linkbtn{border:0;background:none;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}
 .dr-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
 .dr-top p{flex:1;min-width:200px;margin:0}
@@ -1252,7 +1258,12 @@ button.prof:hover{background:var(--raise)}
       <button class="btn" data-exp="html">Formatted document (.html): opens in Word, Pages or a browser, keeps the book style</button>
       <button class="btn" data-exp="md">Markdown (.md): for Scrivener, Obsidian or Vellum</button>
       <button class="btn" data-exp="txt">Plain text (.txt)</button>
-      <button class="btn ghost" data-exp="copy">Copy the whole book as text</button>
+      <button class="btn ghost" data-exp="copy">Copy the whole book, ready to paste into Word or Google Docs</button>
+    </div>
+    <div class="wordopts">
+      <p class="sub" style="margin:0 0 6px"><b>When it goes into Word</b> (this also applies when you copy and paste)</p>
+      <label><input type="checkbox" id="wfSafe"><span><b>Use fonts Word already has</b><small>Swaps each font for the closest one on your computer, like Garamond or Georgia, so nothing odd appears. Turn off if you've installed your book's fonts, or for Google Docs, which has them all.</small></span></label>
+      <label><input type="checkbox" id="wfQuiet"><span><b>Hide Word's spelling and grammar lines</b><small>No red and blue squiggles under your writing in Word. You can turn them back on in Word any time.</small></span></label>
     </div>
   </div>
 </div>
@@ -3997,6 +4008,45 @@ document.addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.sh
 addEventListener("pagehide", flushSideNote);
 document.addEventListener("visibilitychange", () => { if (document.hidden) flushSideNote(); });
 
+/* ---------- Going into Word: fonts Word has, no squiggles, real formatting when pasted ---------- */
+const wordOpts = () => ({safe:lib.settings.wordSafe !== false, quiet:lib.settings.wordQuiet !== false});
+const WORD_FONT = {"EB Garamond":"Garamond", "Cormorant Garamond":"Garamond", "Cardo":"Garamond", "Libre Baskerville":"Baskerville Old Face", "Libre Caslon Text":"Book Antiqua", "Old Standard TT":"Book Antiqua", "Crimson Pro":"Palatino Linotype", "Alegreya":"Palatino Linotype", "Vollkorn":"Palatino Linotype", "Bodoni Moda":"Bodoni MT", "PT Serif":"Cambria", "Source Serif 4":"Cambria", "Merriweather":"Georgia", "Lora":"Georgia", "Literata":"Georgia", "Courier Prime":"Courier New", "Comic Sans":"Comic Sans MS", "Comic Neue":"Comic Sans MS", "Atkinson Hyperlegible":"Verdana", "Lexend":"Verdana"};
+const WORD_GROUP = {"Book classics":"Georgia", "Clean & clear":"Calibri", "Handwritten":"Segoe Print", "Typewriter":"Courier New", "Comic & playful":"Comic Sans MS", "Fantasy & spooky":"Georgia", "Weird & wild":"Calibri"};
+const WORD_HAS = new Set(["Georgia", "Garamond", "Times New Roman", "Cambria", "Calibri", "Arial", "Verdana", "Courier New", "Comic Sans MS", "Palatino Linotype", "Book Antiqua", "Segoe UI", "Aptos"]);
+function wordFont(f) {
+  if (!wordOpts().safe || WORD_HAS.has(f)) return f === "Comic Sans" ? "Comic Sans MS" : f;
+  return WORD_FONT[f] || WORD_GROUP[FONT_GROUP_OF[f]] || (/Mono|Courier|Elite|VT323/.test(f) ? "Courier New" : "Georgia");
+}
+/* Turn clean writing (p, h2, hr already made into p, blockquote) into HTML that Word and Google Docs paste with the book's look */
+function wordHTML(d, st) {
+  const o = wordOpts(), q = o.quiet ? "mso-no-proof:yes;" : "";
+  if (![...d.children].some(n => /^(P|H1|H2|BLOCKQUOTE)$/.test(n.tagName))) { const fam0 = `'${wordFont(st.bodyFont).replace(/'/g, "")}'`; return `<span style="font-family:${fam0};font-size:12pt;${q}">${d.innerHTML}</span>`; }
+  const fam = f => `'${wordFont(f).replace(/'/g, "")}'${o.safe ? "" : ", " + (FALLBACK[FONT_GROUP_OF[f]] || "Georgia, serif").replace(/"/g, "'")}`;
+  const lh = Math.min(2, Math.max(1, st.lineHeight || 1.5)), indent = (st.para || "indent") === "indent";
+  let first = true;
+  for (const n of [...d.children]) {
+    if (n.tagName === "H2" || n.tagName === "H1") {
+      const h = document.createElement("h1"); h.innerHTML = n.innerHTML;
+      h.setAttribute("style", `font-family:${fam(st.headFont)};font-size:20pt;font-weight:normal;color:#000000;text-align:${st.headAlign === "left" ? "left" : "center"};margin:24pt 0 14pt;line-height:1.2;${q}`);
+      n.replaceWith(h); first = true; continue;
+    }
+    if (n.tagName === "BLOCKQUOTE") { n.setAttribute("style", `margin:8pt 36pt;font-family:${fam(st.bodyFont)};font-size:12pt;font-style:italic;${q}`); first = true; continue; }
+    if (n.tagName !== "P") continue;
+    const scene = /text-align:\s*center/.test(n.getAttribute("style") || "");
+    n.setAttribute("style", `font-family:${fam(st.bodyFont)};font-size:12pt;line-height:${lh};margin:0 0 ${indent && !scene ? 0 : 10}pt;text-indent:${indent && !first && !scene ? "0.3in" : "0"};${scene ? "text-align:center;" : ""}${q}`);
+    first = scene;
+  }
+  d.querySelectorAll("[data-cap]").forEach(c => { c.removeAttribute("data-cap"); c.setAttribute("style", (c.getAttribute("style") || "").replace(/font-family:[^;]*/, `font-family:${fam(capFontOf({head:st.headFont, body:st.bodyFont}))}`).replace(/;?$/, ";") + q); });
+  return d.innerHTML;
+}
+(() => {
+  const sync = () => { const o = wordOpts(); $("#wfSafe").checked = o.safe; $("#wfQuiet").checked = o.quiet; };
+  $("#wfSafe").addEventListener("change", e => { lib.settings.wordSafe = e.target.checked; saveLib(); });
+  $("#wfQuiet").addEventListener("change", e => { lib.settings.wordQuiet = e.target.checked; saveLib(); });
+  document.addEventListener("click", e => { if (e.target.closest("#exportBtn")) setTimeout(sync, 0); }, true);
+  sync();
+})();
+
 /* ---------- Copy and cut: paste cleanly into Google Docs, Word, email ---------- */
 /* The big first letter: browsers put the cursor after it, so selections and Home quietly skip it */
 const CAP_RE = /^\s*[\p{P}]*[\p{L}\p{N}]|^\s*\S/u;
@@ -4008,21 +4058,15 @@ function capPara(node) {
 }
 function offsetIn(p, node, off) { const r = document.createRange(); r.setStart(p, 0); try { r.setEnd(node, off); } catch { return -1; } return r.toString().length; }
 function capLen(p) { const t = p.textContent, m = t.match(CAP_RE); return m ? m[0].length + (t.slice(m[0].length).match(/^\s*/) || [""])[0].length : 0; } // the letter and any space after it
-function cleanCopy(e, root, cut) {
-  const sel = getSelection(); if (!sel.rangeCount || sel.isCollapsed) return;
-  let r = sel.getRangeAt(0); if (!root.contains(r.commonAncestorContainer)) return;
-  if (root === ed) { // a selection that starts right after the big letter means the whole line: take the letter too
-    const cp = capPara(r.startContainer), at = cp ? offsetIn(cp, r.startContainer, r.startOffset) : -1;
-    if (cp && at > 0 && at <= capLen(cp)) { r = r.cloneRange(); r.setStart(cp, 0); if (cut) { sel.removeAllRanges(); sel.addRange(r); } }
-  }
-  const d = document.createElement("div"); d.appendChild(r.cloneContents());
+function clipPrep(d, withCap, capFirst) { // labels into chapter headings, the big first letter, scene breaks, nothing else
   const scene = (book() && styleOf(book()).scene) || "* * *";
   d.querySelectorAll("h2").forEach(h => {
     const lab = h.getAttribute("data-display") || "", t = h.textContent.trim(), n = document.createElement("h2");
     n.textContent = lab && t ? `${lab}: ${t}` : (lab || t); h.replaceWith(n);
   });
   const st = book() && styleOf(book());
-  if (st && st.dropCap && root === ed) d.querySelectorAll("h2 + p").forEach(p => {
+  const capTargets = [...d.querySelectorAll("h2 + p")]; if (capFirst && d.firstElementChild && d.firstElementChild.tagName === "P") capTargets.unshift(d.firstElementChild);
+  if (st && st.dropCap && withCap) capTargets.forEach(p => {
     const w = document.createTreeWalker(p, NodeFilter.SHOW_TEXT); let t; while ((t = w.nextNode()) && !t.textContent.trim());
     const m = t && t.textContent.match(/^\s*[\p{P}]*[\p{L}\p{N}]|^\s*\S/u); if (!m) return;
     t.textContent = t.textContent.slice(m[0].length).replace(/^\s+/, "\u00a0"); // Google Docs drops a plain space right after the big letter
@@ -4031,10 +4075,22 @@ function cleanCopy(e, root, cut) {
   });
   d.querySelectorAll("hr").forEach(h => { const p = document.createElement("p"); p.setAttribute("style", "text-align:center"); p.textContent = scene; h.replaceWith(p); });
   d.querySelectorAll("mark, span:not([data-cap]), font").forEach(m => m.replaceWith(...m.childNodes));
-  d.querySelectorAll("*").forEach(x => { const keep = x.tagName === "P" || !!x.dataset.cap; for (const a of [...x.attributes]) if (!(keep && a.name === "style")) x.removeAttribute(a.name); });
+  d.querySelectorAll("*").forEach(x => { const keep = x.tagName === "P" || !!x.dataset.cap; for (const a of [...x.attributes]) if (!(keep && (a.name === "style" || a.name === "data-cap"))) x.removeAttribute(a.name); });
+  return d;
+}
+function cleanCopy(e, root, cut) {
+  const sel = getSelection(); if (!sel.rangeCount || sel.isCollapsed) return;
+  let r = sel.getRangeAt(0); if (!root.contains(r.commonAncestorContainer)) return;
+  if (root === ed) { // a selection that starts right after the big letter means the whole line: take the letter too
+    const cp = capPara(r.startContainer), at = cp ? offsetIn(cp, r.startContainer, r.startOffset) : -1;
+    if (cp && at > 0 && at <= capLen(cp)) { r = r.cloneRange(); r.setStart(cp, 0); if (cut) { sel.removeAllRanges(); sel.addRange(r); } }
+  }
+  const d = document.createElement("div"); d.appendChild(r.cloneContents());
+  clipPrep(d, root === ed);
   const blocks = d.querySelectorAll(":scope > p, :scope > h2, :scope > blockquote, :scope > div");
   const text = blocks.length ? [...d.childNodes].map(n => n.textContent).filter((t, i, a) => t.trim() || i < a.length - 1).join("\n") : d.textContent;
-  e.clipboardData.setData("text/html", d.innerHTML);
+  d.querySelectorAll("[data-cap]").forEach(c => { if (root !== ed) c.removeAttribute("data-cap"); });
+  e.clipboardData.setData("text/html", root === ed && book() ? wordHTML(d, styleOf(book())) : d.innerHTML);
   e.clipboardData.setData("text/plain", text.replace(/ /g, " "));
   e.preventDefault();
   if (cut && root.isContentEditable) document.execCommand("delete");
@@ -4853,7 +4909,14 @@ blockquote{margin:1.1em 1.4em;padding:.2em 1em;border-left:2px solid #999;font-s
 ${d.innerHTML}
 </body></html>`;
   }
-  if (kind === "copy") return copyText(out);
+  if (kind === "copy") {
+    const c = clipPrep(d.cloneNode(true), true, true);
+    const titleP = `<p style="font-family:'${wordFont(s.headFont).replace(/'/g, "")}';font-size:26pt;text-align:center;margin:0 0 24pt;${wordOpts().quiet ? "mso-no-proof:yes;" : ""}">${esc(b.title)}</p>`;
+    const htmlOut = titleP + wordHTML(c, s);
+    try { await navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([htmlOut], {type:"text/html"}), "text/plain":new Blob([out], {type:"text/plain"})})]); toast("Copied the whole book. Paste it into Word or Google Docs."); }
+    catch { return copyText(out); }
+    return;
+  }
   saveFile(name, out, kind === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : kind === "html" ? "text/html" : kind === "md" ? "text/markdown" : "text/plain", kind !== "docx");
 });
 /* ---------- Word (.docx): a small zip file, written by hand ---------- */
@@ -4885,7 +4948,7 @@ function buildDocx(b, d, s) { // d: the manuscript, with chapter labels already 
   const run = (text, f = {}) => text ? `<w:r>${f.b || f.i ? `<w:rPr>${f.b ? "<w:b/>" : ""}${f.i ? "<w:i/>" : ""}</w:rPr>` : ""}<w:t xml:space="preserve">${x(text)}</w:t></w:r>` : "";
   const runs = (node, f = {}) => Array.from(node.childNodes).map(k => k.nodeType === 3 ? run(k.textContent, f) : k.nodeType !== 1 ? "" : k.tagName === "BR" ? (k.nextSibling ? "<w:r><w:br/></w:r>" : "") : k.tagName === "EM" ? runs(k, {...f, i:true}) : k.tagName === "STRONG" ? runs(k, {...f, b:true}) : runs(k, f)).join("");
   const P = (style, inner) => `<w:p><w:pPr><w:pStyle w:val="${style}"/></w:pPr>${inner}</w:p>`;
-  const font = f => `<w:rFonts w:ascii="${x(f)}" w:hAnsi="${x(f)}" w:cs="${x(f)}" w:eastAsia="${x(f)}"/>`;
+  const font = f0 => { const f = wordFont(f0); return `<w:rFonts w:ascii="${x(f)}" w:hAnsi="${x(f)}" w:cs="${x(f)}" w:eastAsia="${x(f)}"/>`; };
   let body = P("Title", run(b.title)) + (b.sub ? P("Subtitle", run(b.sub)) : ""), first = true, capNext = true;
   const capFont = capFontOf({head:s.headFont, body:s.bodyFont});
   const capRuns = n => { // the big first letter: its own run, so Word and Google Docs both keep it
@@ -4927,13 +4990,14 @@ function buildDocx(b, d, s) { // d: the manuscript, with chapter labels already 
   const footer = XH + `<w:ftr ${W}><w:p><w:pPr><w:pStyle w:val="Footer"/></w:pPr><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:t>1</w:t></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>`;
   const RT = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/", CT = "application/vnd.openxmlformats-officedocument.wordprocessingml.";
   return zipStore([
-    {name:"[Content_Types].xml", data:XH + `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="${CT}document.main+xml"/><Override PartName="/word/styles.xml" ContentType="${CT}styles+xml"/><Override PartName="/word/footer1.xml" ContentType="${CT}footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`},
+    {name:"[Content_Types].xml", data:XH + `<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="${CT}document.main+xml"/><Override PartName="/word/styles.xml" ContentType="${CT}styles+xml"/><Override PartName="/word/footer1.xml" ContentType="${CT}footer+xml"/><Override PartName="/word/settings.xml" ContentType="${CT}settings+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`},
     {name:"_rels/.rels", data:XH + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="${RT}officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>`},
     {name:"docProps/core.xml", data:XH + `<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${x(b.title)}</dc:title><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString().replace(/\.\d+Z$/, "Z")}</dcterms:created></cp:coreProperties>`},
-    {name:"word/_rels/document.xml.rels", data:XH + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdStyles" Type="${RT}styles" Target="styles.xml"/><Relationship Id="rIdFtr" Type="${RT}footer" Target="footer1.xml"/></Relationships>`},
+    {name:"word/_rels/document.xml.rels", data:XH + `<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdStyles" Type="${RT}styles" Target="styles.xml"/><Relationship Id="rIdFtr" Type="${RT}footer" Target="footer1.xml"/><Relationship Id="rIdSet" Type="${RT}settings" Target="settings.xml"/></Relationships>`},
     {name:"word/document.xml", data:doc},
     {name:"word/styles.xml", data:styles},
     {name:"word/footer1.xml", data:footer},
+    {name:"word/settings.xml", data:XH + `<w:settings ${W}>${wordOpts().quiet ? "<w:hideSpellingErrors/><w:hideGrammaticalErrors/>" : ""}<w:proofState w:spelling="clean" w:grammar="clean"/></w:settings>`},
   ]);
 }
 /* Save a file: through Claude when running there, as a normal browser download anywhere else */
