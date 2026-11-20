@@ -796,8 +796,22 @@ body.typing .ed mark.nt{background:transparent;border-bottom-color:color-mix(in 
 .side{background:color-mix(in srgb,var(--ink) 2.5%,var(--desk))}
 .side-foot{gap:0;padding:10px 6px 0;flex-wrap:nowrap}
 .side-foot .btn{padding:6px 5px;font-size:12px}
-.toolbar{flex-wrap:wrap;row-gap:2px}
-@media (max-width:720px){.toolbar{flex-wrap:nowrap}}
+.toolbar{flex-wrap:nowrap;overflow:visible;position:relative;z-index:6}
+.tb-more{position:relative;flex:none}
+.tb-more[hidden]{display:none}
+.tb-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:210px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column;gap:1px;z-index:40}
+.tb-menu[hidden]{display:none}
+.tb-menu .tb{justify-content:flex-start;width:100%;padding:8px 12px;font-size:13.5px;color:var(--ink)}
+.tb-menu .tb .lg{display:inline!important}
+.tb-menu .tb.icon{padding:8px 12px;justify-content:flex-start}
+.tb-menu #keysBtn{font-size:0;min-width:0}
+.tb-menu #keysBtn::after{content:"Keyboard shortcuts";font-size:13.5px}
+body.typing .toolbar:has(.tb-menu:not([hidden])){opacity:1}
+@media (max-width:720px){
+  body:has(#deskView:not([hidden])) .brand{font-size:0;padding-inline:4px}
+  body:has(#deskView:not([hidden])) .brand b{font-size:26px}
+  .bar{gap:6px}
+}
 .page{box-shadow:var(--page-shadow)}
 
 /* Modals and lists added for profiles, trash and recovery */
@@ -1110,6 +1124,7 @@ button.prof:hover{background:var(--raise)}
         <button class="tb" id="typeBtn" title="Keep the line you're writing in the middle of the screen">Typewriter</button>
         <button class="tb" id="focusBtn" title="Fade everything except the paragraph you're writing (Esc to leave)">Focus</button>
         <button class="tb icon desk-keys" id="keysBtn" title="Keyboard shortcuts (Ctrl+/)" aria-label="Keyboard shortcuts">?</button>
+        <div class="tb-more" id="tbMoreWrap" hidden><button class="tb" id="tbMore" aria-haspopup="menu" aria-expanded="false" title="More tools">More <span aria-hidden="true">▾</span></button><div class="tb-menu" id="tbMenu" role="menu" hidden></div></div>
       </div>
       <div class="ro-bar" id="roBar" hidden><span id="roTxt"></span><button class="btn primary" id="roTake">Edit here instead</button></div>
       <div class="findbar" id="findBar" hidden role="search">
@@ -4191,6 +4206,46 @@ $("#drBody").addEventListener("click", e => {
   if (r) return lostPreview(r.dataset.lread);
   if (pb) return putBackLost(pb.dataset.lput);
 });
+
+/* ---------- Toolbar: always one line; whatever doesn't fit goes under More ---------- */
+(() => {
+  const bar = $(".toolbar"), wrap = $("#tbMoreWrap"), menu = $("#tbMenu"), more = $("#tbMore");
+  // first to move into More → last
+  const ORDER = ["#keysBtn", "#focusBtn", "#typeBtn", "#sprintBtn", "#checkBtn", "#findBtn", "#styleBtn", "#mnoteBtn", '[data-cmd="note"]', "#draftsBtn", "#nbBtn", '[data-fmt2="italic"]', '[data-fmt2="bold"]'];
+  const items = ORDER.map(q => bar.querySelector(q)).filter(Boolean);
+  const home = new Map(items.map(el => { const c = document.createComment("tb"); el.parentNode.insertBefore(c, el); return [el, c]; }));
+  const shown = el => getComputedStyle(el).display !== "none";
+  const fits = () => bar.scrollWidth <= bar.clientWidth + 1;
+  let busy = false;
+  function fit() {
+    if (busy || !bar.offsetParent) return; busy = true;
+    for (const el of items) home.get(el).after(el);           // everything back in its place
+    wrap.hidden = true; $("#wcount").style.display = "";
+    if (!fits()) {
+      $("#wcount").style.display = "none";                       // the word count is also in the sidebar
+      if (!fits()) {
+        wrap.hidden = false;
+        for (const el of items) {
+          if (fits()) break;
+          if (!shown(el)) continue;
+          menu.append(el);
+        }
+        // keep the menu in toolbar order
+        [...menu.children].sort((a, b) => ORDER.findIndex(q => a.matches(q)) < ORDER.findIndex(q => b.matches(q)) ? 1 : -1).forEach(el => menu.append(el));
+        if (!menu.children.length) wrap.hidden = true;
+      }
+    }
+    busy = false;
+  }
+  const close = () => { menu.hidden = true; more.setAttribute("aria-expanded", "false"); };
+  more.addEventListener("click", e => { e.stopPropagation(); menu.hidden = !menu.hidden; more.setAttribute("aria-expanded", String(!menu.hidden)); });
+  menu.addEventListener("click", e => { if (e.target.closest(".tb")) setTimeout(close, 0); });
+  document.addEventListener("click", e => { if (!e.target.closest("#tbMoreWrap")) close(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !menu.hidden) { close(); more.focus(); } });
+  new ResizeObserver(() => requestAnimationFrame(fit)).observe(bar);
+  window.fitToolbar = fit;
+  fit();
+})();
 
 /* ---------- Keyboard shortcuts ---------- */
 function openKeys() {
