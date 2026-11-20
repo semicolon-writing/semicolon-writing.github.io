@@ -293,6 +293,8 @@ body.typing .bar:hover,body.typing .bar:focus-within{opacity:1}
 .toolbar{display:flex;align-items:center;gap:2px;padding:6px 14px;overflow-x:auto;transition:opacity .5s;flex:none;scrollbar-width:none}
 .toolbar::-webkit-scrollbar{display:none}
 body.typing .toolbar{opacity:.25}
+.side{transition:opacity .5s}
+body.typing .side{opacity:.3}
 body.typing .toolbar:hover,body.typing .toolbar:focus-within{opacity:1}
 .tb{border:1px solid transparent;background:none;border-radius:8px;padding:6px 10px;font-size:13px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;color:var(--ink-2)}
 .tb:hover{background:var(--raise);color:var(--ink)}
@@ -736,7 +738,7 @@ body.typing .ed mark.nt{background:transparent;border-bottom-color:color-mix(in 
 .goal{cursor:pointer}
 #endBtn{border-color:transparent;background:none;color:var(--ink-2)}
 #endBtn:hover{background:var(--raise);color:var(--ink)}
-@media (hover:none){body.typing .bar,body.typing .toolbar{opacity:1}}
+@media (hover:none){body.typing .bar,body.typing .toolbar,body.typing .side{opacity:1}}
 
 /* Who's writing */
 .who{display:inline-flex;align-items:center;gap:8px;border:0;background:none;color:var(--ink-2);padding:3px 10px 3px 3px;border-radius:999px;font-size:13px;max-width:180px}
@@ -903,6 +905,15 @@ button.prof:hover{background:var(--raise)}
 .wordopts label b{display:block;font-weight:600}
 #exportModal .fields .btn{white-space:normal;text-align:left;justify-content:flex-start;height:auto;line-height:1.35;padding:10px 14px}
 .wordopts small{color:var(--ink-3);font-size:12.5px}
+.dtabs{display:flex;gap:2px;padding:0 18px;border-bottom:1px solid var(--line);margin-bottom:4px}
+.dtabs[hidden]{display:none}
+.dtabs button{border:0;background:none;color:var(--ink-2);padding:8px 10px;font-size:13.5px;border-bottom:2px solid transparent;margin-bottom:-1px}
+.dtabs button[aria-selected="true"]{color:var(--ink);font-weight:600;border-bottom-color:var(--accent)}
+.set-h{font:600 11.5px/1.3 var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:6px 0 -4px}
+.menu-btn{display:inline-flex}
+.bar-right{display:none;position:fixed;top:calc(env(safe-area-inset-top,0px) + 54px);right:12px;flex-direction:column;align-items:stretch;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:8px;min-width:200px;z-index:45}
+.bar-right.open{display:flex}
+.bar-right .btn{justify-content:flex-start}
 .linkbtn{border:0;background:none;padding:0;color:var(--accent);font:inherit;text-decoration:underline;cursor:pointer}
 .dr-top{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
 .dr-top p{flex:1;min-width:200px;margin:0}
@@ -1048,7 +1059,7 @@ button.prof:hover{background:var(--raise)}
     </div>
     <button class="btn ghost menu-btn" id="menuBtn" aria-label="Menu">Menu</button>
     <div class="bar-right" id="barRight">
-      <button class="btn ghost" id="themeBtn">Look</button>
+      <button class="btn ghost" id="themeBtn">Look &amp; fonts</button>
       <button class="btn ghost" id="settingsBtn">Settings</button>
       <button class="btn desk-only" id="endBtn">Session summary</button>
     </div>
@@ -1115,7 +1126,7 @@ button.prof:hover{background:var(--raise)}
         <button class="tb icon" id="undoBtn" title="Undo (Ctrl+Z)" aria-label="Undo" disabled>↶</button>
         <button class="tb icon" id="redoBtn" title="Redo (Ctrl+Shift+Z)" aria-label="Redo" disabled>↷</button>
         <span class="tb-sep"></span>
-        <button class="tb" id="styleBtn" title="This book's fonts, chapter headings and scene breaks"><b style="font-family:Georgia,serif">Aa</b><span class="lg"> Fonts &amp; style</span></button>
+        <button class="tb" id="styleBtn" title="Fonts, chapter headings and scene breaks for this book, plus light or dark and text size"><b style="font-family:Georgia,serif">Aa</b><span class="lg"> Look &amp; fonts</span></button>
         <span class="tb-spacer"></span>
         <span class="wcount" id="wcount">0 words</span>
         <button class="tb" id="findBtn" title="Find and replace (Ctrl+F)">Find</button>
@@ -1236,20 +1247,19 @@ button.prof:hover{background:var(--raise)}
   <div class="modal">
     <div class="actions"><h2>Settings</h2><div class="r"><button class="btn" data-close>Done</button></div></div>
     <div class="fields">
+      <h3 class="set-h">Writing</h3>
       <label class="f"><span>Daily word goal</span><input type="number" id="sDaily" min="50" step="50"></label>
       <div class="f"><span>Sprint length</span><div class="seg" id="sSprint"></div></div>
       <label class="check"><input type="checkbox" id="sSmart"> Smart punctuation: curly quotes, -- becomes —, ... becomes …</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="openThemeFromSettings">Look</button><button class="btn" id="replayTour">Take the tour</button><button class="btn desk-keys" id="keysFromSettings">Keyboard shortcuts</button></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="openThemeFromSettings" hidden>Look</button><button class="btn" id="replayTour">Take the tour</button><button class="btn desk-keys" id="keysFromSettings">Keyboard shortcuts</button></div>
       <div class="divider"></div>
-      <div class="f" id="removeSec"><span>Remove me from this computer</span><div class="lock-state"><p id="removeTxt"></p>
-        <div><button type="button" class="btn ghost danger" id="removeStart">Remove me from this computer</button></div>
-        <form id="removeForm" class="remove-box" hidden><p id="removeMsg"></p><div class="inline-form"><input id="removeName" autocomplete="off" aria-label="Type your name to confirm"><button class="btn danger" id="removeGo">Remove</button><button type="button" class="btn ghost" id="removeCancel">Cancel</button></div></form></div></div>
-      <div class="divider"></div>
+      <h3 class="set-h">Account and lock</h3>
       <div class="f" id="acctSec" hidden><span>Account</span><div class="lock-state"><p id="acctTxt"></p>
         <div><button type="button" class="btn" id="acctBtn"></button></div></div></div>
       <div class="divider" id="acctDiv" hidden></div>
       <div class="f"><span>Lock</span><div class="lock-state" id="lockState"></div></div>
       <div class="divider"></div>
+      <h3 class="set-h">Backups and offline</h3>
       <div class="f"><span>Back up your books</span><div class="lock-state"><p>Download everything as one file to keep somewhere safe, or to move your books to another browser, computer or the Semi Colon website.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn" id="backupBtn">Download a backup</button><button type="button" class="btn" id="restoreBtn">Restore from a backup…</button></div></div></div>
       <div class="f" id="seedSec" hidden><span>Books inside this file</span><div class="lock-state"><p id="seedTxt"></p>
@@ -1258,6 +1268,11 @@ button.prof:hover{background:var(--raise)}
         <div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn primary" id="installBtn" hidden>Install Semi Colon as an app</button><button type="button" class="btn" id="offlineBtn">Download Semi Colon as a file</button></div>
         <p class="backup-status" id="installTip" hidden></p></div></div>
       <p class="backup-status" id="backupStatus"></p><input type="file" id="restoreFile" accept=".json,application/json" hidden>
+      <div class="divider"></div>
+      <h3 class="set-h">This computer</h3>
+      <div class="f" id="removeSec"><span>Remove me from this computer</span><div class="lock-state"><p id="removeTxt"></p>
+        <div><button type="button" class="btn ghost danger" id="removeStart">Remove me from this computer</button></div>
+        <form id="removeForm" class="remove-box" hidden><p id="removeMsg"></p><div class="inline-form"><input id="removeName" autocomplete="off" aria-label="Type your name to confirm"><button class="btn danger" id="removeGo">Remove</button><button type="button" class="btn ghost" id="removeCancel">Cancel</button></div></form></div></div>
     </div>
     <p class="sub" id="storageNote" style="margin:0"></p>
   </div>
@@ -1374,6 +1389,7 @@ button.prof:hover{background:var(--raise)}
 
 <aside class="drawer" id="themeDrawer" hidden aria-label="Theme">
   <div class="drawer-head"><div><h3 id="dTitle">Theme</h3><p id="dScope"></p></div><button class="btn" id="dClose">Done</button></div>
+  <div class="dtabs" id="dTabs" role="tablist" hidden></div>
   <div class="drawer-body" id="dBody"></div>
 </aside>
 
@@ -4694,6 +4710,12 @@ function closeThemes() { if (editingTheme) delete editingTheme._fresh; if (editi
 const segHTML = (attr, key, val, items) => `<div class="seg" ${attr}="${key}">${items.map(([v, l]) => `<button type="button" data-v="${v}" class="${String(val) === String(v) ? "on" : ""}">${l}</button>`).join("")}</div>`;
 function renderDrawer() {
   const b = scopeBook();
+  const tabs = $("#dTabs");
+  if (tabs) {
+    const look = dTab === "theme" || dTab === "style";
+    tabs.hidden = !look;
+    if (look) { lookTab = dTab; tabs.innerHTML = `<button type="button" role="tab" data-dt="style" aria-selected="${dTab === "style"}">This book</button><button type="button" role="tab" data-dt="theme" aria-selected="${dTab === "theme"}">Everywhere</button>`; }
+  }
   if (dTab === "check") {
     $("#dTitle").textContent = "Check"; $("#dScope").textContent = b ? `${cur.page === "ms" ? "The manuscript" : "This notebook page"} of “${b.title}”` : "";
     dBody.innerHTML = b ? checkHTML() : `<div class="dnote">Open a book to check it.</div>`;
@@ -4701,7 +4723,7 @@ function renderDrawer() {
   }
   if (dTab === "theme") {
     const L = lib.settings.look, a = adjOf();
-    $("#dTitle").textContent = "Look"; $("#dScope").textContent = "The same everywhere: your shelf and every book";
+    $("#dTitle").textContent = "Look & fonts"; $("#dScope").textContent = "Everywhere: your shelf and every book";
     const si = SIZES.findIndex(x => x[0] === a.size), pi = SPACING.findIndex(x => x[0] === a.spacing);
     dBody.innerHTML = `
       <div class="dsec"><span>Light or dark</span>${segHTML("data-look", "mode", L.mode, [["light", "Light"], ["dark", "Dark"], ["device", "Match my device"]])}</div>
@@ -4715,7 +4737,7 @@ function renderDrawer() {
   }
   // Book style tab
   if (!b) {
-    $("#dTitle").textContent = "Fonts & style"; $("#dScope").textContent = "Each book has its own text style";
+    $("#dTitle").textContent = "Look & fonts"; $("#dScope").textContent = "Each book has its own fonts and style";
     dBody.innerHTML = `<div class="dnote">Open a book to choose its style: fonts, chapter headings, chapter numbers and scene breaks.<br><br>New books start with <b>${esc(bookStyleOf(null).name)}</b>, the style you used last.</div>`;
     return;
   }
@@ -4723,7 +4745,7 @@ function renderDrawer() {
   const users = lib.books.filter(x => x.style === st.id && x.id !== b.id).map(x => x.title);
   if (dMode === "fonts") return renderFontBrowser(b, eff);
   if (dMode === "gallery") {
-    $("#dTitle").textContent = "Fonts & style"; $("#dScope").textContent = `For “${b.title}” · remembered for this book`;
+    $("#dTitle").textContent = "Look & fonts"; $("#dScope").textContent = `For “${b.title}” only`;
     const grp = x => x.custom ? "yours" : x.group === "genre" ? "genre" : "classic";
     if (!sGroup) sGroup = grp(st);
     const groups = [["classic", "Classic"], ["genre", "Genre"], ...(lib.bookStyles.length ? [["yours", "Yours"]] : [])];
@@ -4797,7 +4819,7 @@ function renderFontBrowser(b, eff) {
   const key = fb.key;
   $("#dTitle").textContent = key === "body" ? "Story text font" : "Title font";
   $("#dScope").textContent = `For “${isSealed(b.title) ? "this book" : b.title}” · tap a font to try it on your page`;
-  dBody.innerHTML = `<button type="button" class="back-link" id="fBack">← Fonts &amp; style</button>
+  dBody.innerHTML = `<button type="button" class="back-link" id="fBack">← Look &amp; fonts</button>
     <div class="fb-tools"><label class="fb-search"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.6"/><path d="m10.5 10.5 3.2 3.2"/></svg><input type="search" id="fSearch" placeholder="Search ${FONT_CATALOG.reduce((n, [, l]) => n + l.length, 0)} fonts" value="${esc(fb.q)}" aria-label="Search fonts" autocomplete="off"></label>
       ${key === "head" ? `<label class="check fb-ital"><input type="checkbox" id="fItal"${eff.headItalic ? " checked" : ""}> Italic</label>` : ""}</div>
     <div class="fb-cats" role="group" aria-label="Font groups">${fontCats(key).map(c => `<button type="button" data-fcat="${esc(c)}" aria-pressed="${c === fb.cat}">${esc(c)}</button>`).join("")}</div>
@@ -4895,8 +4917,11 @@ dBody.addEventListener("input", e => {
   if (t.dataset.sb && editingStyle) { editingStyle[t.dataset.sb] = t.checked; return refreshPage(); }
 });
 $("#dClose").addEventListener("click", () => { closeThemes(); saveLib(); });
-$("#themeBtn").addEventListener("click", () => (drawer.hidden || dTab !== "theme") ? openThemes("theme") : closeThemes());
-$("#styleBtn").addEventListener("click", () => (drawer.hidden || dTab !== "style") ? openThemes("style") : closeThemes());
+let lookTab = null; // the Look & fonts tab you used last
+$("#dTabs").addEventListener("click", e => { const t = e.target.closest("[data-dt]"); if (!t || t.dataset.dt === dTab) return; if (editingTheme) delete editingTheme._fresh; if (editingStyle) delete editingStyle._fresh; saveLib(); dTab = t.dataset.dt; dMode = "gallery"; sGroup = null; titleGroup = null; renderDrawer(); dBody.scrollTop = 0; });
+const isLook = () => !drawer.hidden && (dTab === "theme" || dTab === "style");
+$("#themeBtn").addEventListener("click", () => isLook() ? closeThemes() : openThemes(scopeBook() ? (lookTab || "style") : "theme"));
+$("#styleBtn").addEventListener("click", () => isLook() ? closeThemes() : openThemes(lookTab || "style"));
 
 /* Sprint popover */
 $("#sprintOpts").innerHTML = [10,15,25,45].map(m => `<button data-m="${m}">${m}m</button>`).join("");
@@ -5142,7 +5167,7 @@ const TOURS = {
   desk: [
     {t:'[data-cmd="chapter"]', h:"Chapter breaks", p:"Just write. When a new chapter begins, press this right where your cursor is."},
     {t:() => narrow() ? $("#sideToggle") : $("#toc"), h:"Contents", p:"Chapters appear here by themselves. Click one to jump to it, or drag to reorder."},
-    {t:"#styleBtn", h:"Fonts & style", p:"Fonts, decorations and chapter headings for this book. Everything saves as you type, so just start writing."},
+    {t:"#styleBtn", h:"Look & fonts", p:"Fonts, decorations and chapter headings for this book, plus light or dark and text size. Everything saves as you type, so just start writing."},
   ],
 };
 let tour = null;
