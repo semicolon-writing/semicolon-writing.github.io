@@ -226,7 +226,7 @@ body.typing .bar:hover,body.typing .bar:focus-within{opacity:1}
 .cv-title .s{font-size:6.6cqw;letter-spacing:.2em;margin:.35em 0 .3em;font-weight:500}
 .cv-metal{background:var(--metal);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 .45cqw .5cqw rgba(0,0,0,.75))}
 .cv-author{position:absolute;left:4%;right:4%;bottom:7%;z-index:2;text-align:center;font-family:"Cinzel",Georgia,serif;font-size:6.2cqw;letter-spacing:.22em;text-transform:uppercase;font-weight:500}
-.tg-pick{display:flex;flex-wrap:wrap;gap:6px;margin-top:-6px}.tg-pick button{border:1px solid var(--line);background:var(--raise);color:var(--ink-2);border-radius:999px;padding:4px 10px;font-size:12px}.tg-pick button.on{border-color:var(--accent);color:var(--ink);background:var(--accent-soft)}
+.tg-pick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.tg-pick button{border:1px solid var(--line);background:var(--raise);color:var(--ink-2);border-radius:999px;padding:4px 10px;font-size:12px}.tg-pick button.on{border-color:var(--accent);color:var(--ink);background:var(--accent-soft)}
 .np-menu{position:fixed;z-index:47;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:6px;display:flex;flex-direction:column;min-width:200px}.np-menu[hidden]{display:none}
 .np-menu button{border:0;background:none;text-align:left;padding:8px 10px;border-radius:8px;font-size:13.5px;color:var(--ink)}.np-menu button:hover{background:var(--raise)}.np-menu small{display:block;color:var(--ink-3);font-size:11.5px}
 .cv-row{display:flex;gap:16px;align-items:flex-start}.cv-prev{width:110px;flex:none}.cv-side{display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -4567,7 +4567,7 @@ document.addEventListener("pointerdown", e => { const d = $("#deskView"); if (d.
 document.addEventListener("keydown", e => {
   if (e.key !== "Escape") return;
   const open = $$(".scrim").find(s => !s.hidden);
-  if (open) { if (open.id === "confirmModal") $("#cfNo").click(); else if (open.id !== "summaryModal") open.hidden = true; return; }
+  if (open) { if (open.id === "confirmModal") $("#cfNo").click(); else if (open.id === "summaryModal") $("#sumKeep").click(); else open.hidden = true; return; }
   if (tour) { $("#tourSkip").click(); return; }
   if (!$("#notePop").hidden) { closeNotePop(); return; }
   if (find.open) { closeFind(); return; }
@@ -4579,7 +4579,7 @@ document.addEventListener("keydown", e => {
 
 /* ---------- Modals ---------- */
 $$(".scrim").forEach(s => {
-  s.addEventListener("click", e => { if (e.target === s && s.id !== "summaryModal" && s.id !== "confirmModal") s.hidden = true; });
+  s.addEventListener("click", e => { if (e.target !== s || s.id === "confirmModal") return; if (s.id === "summaryModal") $("#sumKeep").click(); else s.hidden = true; });
   s.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", () => s.hidden = true));
 });
 let cfResolve = null;
